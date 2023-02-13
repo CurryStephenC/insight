@@ -1,0 +1,500 @@
+* {
+    box-sizing: border-box;
+}
+
+.field {
+    height: 50px;
+    width: 516px;
+    margin-bottom: 20px;
+    color: #333333;
+}
+
+.field.half {
+    display: inline-block;
+    width: 253px;
+    vertical-align: top;
+    margin-right: 3.5px;
+}
+
+.field.half+.half {
+    margin-left: 3.5px;
+    margin-right: 0px;
+}
+
+.field.cuarter {
+    display: inline-block;
+    width: 122px;
+    vertical-align: top;
+    margin-right: 3.5px;
+}
+
+.field.cuarter+.cuarter {
+    margin-left: 3.5px;
+    margin-right: 0px;
+}
+
+.field label {
+    display: block;
+    color: #29303B;
+    font-size: 15px;
+}
+
+.field.newPayment {
+    padding-top: 21px;
+    margin-bottom: 0px;
+}
+
+.newPayment label {
+    width: fit-content;
+    float: left;
+}
+
+.container {
+    margin-left: 26px;
+}
+
+.example {
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 707px;
+    padding-bottom: 20px;
+    border: 1px solid #DEDFE0;
+}
+
+.example::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.custom input {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: block;
+    font-size: 15px;
+    width: 100%;
+    border: 1px solid #CACBCC;
+    height: 50px;
+    padding: 0px 14px;
+    background: white;
+    outline: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    border-radius: 2px;
+}
+
+.custom select {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: block;
+    font-size: 15px;
+    width: 100%;
+    border: 1px solid #CACBCC;
+    height: 50px;
+    padding: 0px 14px;
+    background: white;
+    outline: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    border-radius: 2px;
+    -webkit-border-radius: 2px;
+}
+
+::placeholder {
+    color: #B8BBC0;
+}
+
+.custom input::-moz-placeholder {
+    color: #aab7c4;
+}
+
+.custom input::-webkit-input-placeholder {
+    color: #aab7c4;
+}
+
+.custom .fitInput {
+    width: fit-content;
+    float: left;
+}
+
+.brand-img {
+    margin-right: 13px;
+}
+
+.brand-img.visa {
+    height: 13.42px;
+    float: left;
+    margin-top: 1px;
+}
+
+.brand-img.first {
+    margin-left: 26px;
+}
+
+.brand-img.mastercard {
+    height: 20px;
+    float: left;
+    margin-top: -4px;
+}
+
+.brand-img.amex {
+    height: 20px;
+    float: left;
+    margin-top: -4px;
+}
+
+.brand-img.discover {
+    height: 8px;
+    float: left;
+    margin-top: 2px;
+}
+
+.custom button {
+    border-radius: 2px;
+    outline: none;
+    text-decoration: none;
+    color: #fff;
+    background: #7F17AF;
+    white-space: nowrap;
+    height: 50px;
+    width: 269px;
+    line-height: 50px;
+    padding: 0 14px;
+    font-size: 15px;
+    letter-spacing: 0.025em;
+    text-decoration: none;
+    -webkit-transition: all 150ms ease;
+    transition: all 150ms ease;
+    float: left;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.custom hr {
+    background-color: #DEDFE0;
+    height: 1px;
+    border: 0;
+    margin-left: -27px;
+    margin-bottom: 30px;
+}
+
+.terms {
+    font-size: 11px;
+    width: 217px;
+    float: left;
+    margin-left: 28px;
+    margin-top: 14px;
+}
+
+#container {
+    height: 50px;
+}
+
+.field.fieldCheck {
+    margin-bottom: 11px;
+    margin-top: 14px;
+    height: fit-content;
+}
+
+.secureConnection {
+    font-size: 11px;
+    width: 91px;
+    float: left;
+    margin-left: 28px;
+    margin-top: 14px;
+    color: #CACBCC;
+}
+
+.secureConnection img {
+    float: left;
+    height: 30px;
+    margin-top: -5px;
+}
+
+.secureConnection label {
+    margin-left: 8px;
+    float: left;
+    width: 61px;
+    margin-top: 3px;
+}
+
+.errorMsgContainer {
+    margin-top: 5px;
+}
+
+.helpError {
+    font-size: 11px;
+    max-height: 30px;
+    color: #686f7a;
+    margin-bottom: 0;
+    visibility: hidden;
+}
+
+.hasError .helpError {
+    visibility: visible;
+}
+
+.field.hasError {
+    margin-bottom: 36px;
+}
+
+.Field--required .DlocalField {
+    border: 1px solid #7F17AF;
+}
+
+.Field--required .helpError {
+    visibility: visible;
+}
+
+.DlocalField {
+    background-color: white;
+    height: 50px;
+    padding: 10px 12px;
+    -webkit-transition: box-shadow 150ms ease;
+    transition: box-shadow 150ms ease;
+    border: 1px solid #CACBCC;
+}
+
+.Field--required .DlocalField--empty {
+    border: 1px solid #7F17AF;
+}
+
+.Field--required .DlocalField--complete {
+    border: 1px solid #CACBCC;
+}
+
+.DlocalField--invalid {
+    border: 1px solid #7F17AF;
+}
+
+.DlocalField--invalid .helpError {
+    visibility: visible;
+}
+
+.custom .hasError select:required,
+.custom .hasError input:required {
+    border-color: #7F17AF;
+}
+
+.custom select:focus,
+.custom input:focus {
+    border: 1px solid #CACBCC;
+}
+
+.tooltipContainer {
+    position: absolute;
+    height: 30px;
+    top: 17px;
+    right: 5px;
+}
+
+.tooltipImage {
+    height: 16px;
+}
+
+.tooltipInner {
+    visibility: hidden;
+    position: absolute;
+    top: -95px;
+    left: -94px;
+    height: 20px;
+    z-index: 5;
+}
+
+.tooltipImage:hover+.tooltipInner {
+    visibility: visible;
+}
+
+.tooltipInnerImage {
+    height: 70px;
+}
+
+/*
+LOADER
+*/
+
+/* Center the loader */
+
+#loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #7F17AF;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+#custom-logo {
+    position: absolute;
+    left: calc(50% - 48px);
+    top: calc(50% - 20.28px);
+    width: 70px;
+    z-index: 1;
+}
+
+#panOverlay {
+    visibility: hidden;
+}
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Add animation to "page content" */
+
+.animate-bottom {
+    position: relative;
+    -webkit-animation-name: animatebottom;
+    -webkit-animation-duration: 1s;
+    animation-name: animatebottom;
+    animation-duration: 1s
+}
+
+@-webkit-keyframes animatebottom {
+    from {
+        bottom: -100px;
+        opacity: 0
+    }
+    to {
+        bottom: 0px;
+        opacity: 1
+    }
+}
+
+@keyframes animatebottom {
+    from {
+        bottom: -100px;
+        opacity: 0
+    }
+    to {
+        bottom: 0;
+        opacity: 1
+    }
+}
+
+#customContainer {
+    visibility: hidden;
+}
+
+body {
+    background: #F8F8F9;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@media screen and (max-width: 720px) {
+    .secureConnection {
+        float: none;
+        width: fit-content;
+        margin-left: 298px;
+    }
+    .example {
+        height: fit-content;
+        width: calc(100% - 20px);
+    }
+    .custom button {
+        margin-bottom: 20px;
+    }
+    .terms {
+        margin-bottom: 20px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .field {
+        width: calc(100% - 13px);
+    }
+    .field.field.half {
+        width: calc(100% - 13px);
+    }
+    .field.half+.half {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+    .field.cuarter {
+        width: calc(50% - 13px);
+    }
+    .terms {
+        margin-top: 0px;
+        margin-left: 0px;
+        float: left;
+        width: 50%;
+    }
+    .secureConnection {
+        float: left;
+        margin-left: 25px;
+        margin-top: 0px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .newPayment label {
+        width: 100%;
+    }
+    .brand-img.visa {
+        margin-left: 33px;
+    }
+    .field.newPayment {
+        margin-bottom: 30px;
+    }
+    .secureConnection {
+        float: none;
+        width: fit-content;
+        margin-left: 0px;
+    }
+    .terms {
+        margin-left: 0px;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .custom button {
+        width: calc(100% - 13px);
+    }
+}
+
+@media screen and (max-width: 310px) {
+    .brand-img.mastercard {
+        margin-right: 70px;
+    }
+    .brand-img.amex {
+        margin-left: 33px;
+        margin-top: 4px;
+    }
+    .brand-img.discover {
+        margin-top: 9px;
+    }
+    .field.newPayment {
+        margin-bottom: 50px;
+    }
+}
+
+@media screen and (max-width: 270px) {
+    .brand-img.mastercard {
+        margin-right: 40px;
+    }
+    .field.newPayment {
+        margin-bottom: 70px;
+    }
+}

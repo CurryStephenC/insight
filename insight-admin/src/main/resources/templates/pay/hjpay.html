@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>Pay</title>
+		<script>
+			! function(n, e) {
+				var t = n.documentElement,
+					i = "orientationchange" in window ? "orientationchange" : "resize",
+					d = function() {
+						var n = t.clientWidth;
+						if (n) {
+							var e = n / 37.5;
+							e = 20 < e ? 20 : e, t.style.fontSize = e + "px"
+						}
+					};
+				n.addEventListener && (e.addEventListener(i, d, !1), n.addEventListener("DOMContentLoaded", d, !1))
+			}(document, window)
+		</script>
+		<link rel="stylesheet" type="text/css" href="/staticpay/css/pay/style.css"  />
+		<link rel="stylesheet" type="text/css" href="/staticpay/css/pay/animate.min.css"  />
+		<style type="text/css">
+			
+		</style>
+	</head>
+	<body>
+		<div class="main">
+			<div  class="box box1">
+				<div  class="hd">
+					<div  class="l-t">
+<!-- 						<img  src="img/15aee6bb.video3.png" alt="" class="img"> -->
+					</div>
+					<div  class="l-c">
+						<p  class="p-1">  </p>
+						<div  class="divTop div-1"><span  style="">₹</span ><b id = "foo1" th:text="${vo.paymoney}"></b> </div>
+					</div>
+					<div  class="l-r"><span class="btn" data-clipboard-action ="copy" data-clipboard-target ="#foo1">copy</span></div>
+				</div>
+				<div  class="center">
+					<div  class="c-1"> <span >Step 1：</span>  Copy Recipient's Name、Card Number、IFSC Code </div>
+					<div  class="c-2">
+						<div  class="c-l">Recipient's Name</div>
+						<div  class="c-c"id = "foo2" th:text="${vo.username}"></div>
+						<div  class="c-r btn"  data-clipboard-action ="copy" data-clipboard-target ="#foo2"> copy </div>
+					</div>
+					<div  class="c-2">
+						<div  class="c-l">Card Number</div>
+						<div  class="c-c"id = "foo3" th:text="${vo.bankaccount}"> sameerkhan7@upi </div>
+						<div  class="c-r btn"  data-clipboard-action ="copy" data-clipboard-target ="#foo3"> copy </div>
+					</div>
+					<div  class="c-2">
+						<div  class="c-l">IFSC Code</div>
+						<div  class="c-c"id = "foo4" th:text="${vo.ifsc}"> sameerkhan7@upi </div>
+						<div  class="c-r btn"  data-clipboard-action ="copy" data-clipboard-target ="#foo4"> copy </div>
+					</div>
+					<div  class="c-2">
+						<div  class="c-l">Bank Name</div>
+						<div  class="c-c"id = "foo5" th:text="${vo.bankname}"> sameerkhan7@upi </div>
+						<div  class="c-r btn"  data-clipboard-action ="copy" data-clipboard-target ="#foo5"> copy </div>
+					</div>
+					<div  class="tips pulse animated infinite tips2"> Mode of payment: RTGS OR IMPS</div>
+					<div  class="line"></div>
+					<div  class="c-1 c-bottom">
+						<span >Step 2：</span>
+						Open your Bank App and use bank
+                        card(132131233213) to transfer
+                        money to the recipient’s bank card-<i th:text="${vo.bankaccount}"></i>
+					</div>
+				</div>
+				<div>
+					<div  class="after">
+                        After the payment is completed, please click "I've
+                        paid" to complete the recharge, otherwise the
+                        recharge will not be credited.
+					</div>
+					<div  class="tips pulse animated infinite"> If you have paid, please click </div>
+					<div  class="btn" id="next"> I've paid </div>
+					<div  class="txt">
+<!-- 						<div  class="div-l"> Order No. FB20210625739030000001657 </div> -->
+						<div  class="div-r"></div>
+					</div>
+				</div>
+<!-- 				<video class="vjs-tech" id="vjs_video_3_html5_api" tabindex="-1" preload="auto" src="https://wsbroker.oss-cn-hongkong.aliyuncs.com/wsbroker/video/pay.mp4?=" controls="controls"></video> -->
+			</div>
+			
+			<div class="box2">
+				<div class="sendStatus">
+				<div  class="box">
+					<img  src="data:image/png;base64,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" alt="" class="img"> 
+					<p >Fail</p> 
+<!-- 					<span >I Transfer to SHAMS sameerkhan7@upi/ FB20210625739030000001657/Ref No. /Rs.1001.00</span> -->
+				</div>
+				</div>
+			</div>
+			<div class="box3">
+				<div class="sendStatus">
+				<div  class="box">
+					<p >Upload payment screenshot</p> 
+					<form action="/api/pay/hjpaySubmit" method="post" enctype="multipart/form-data">
+						<input type="hidden" th:value="${vo.orderid}" name="orderid">
+						<input type="text" name="transactionid" class="inp" placeholder="Please fill in the transaction number" maxlength="30">
+						<p class="p">Select Picture</p> 
+						<img src="" alt="" id="img">
+						<a href="javascript:;"  class="file">
+							+
+						    <input type="file" name="file" id="file">
+						</a>
+						<input type="submit" value="Submit" id="Submit" class="Submit" style="display: none;">
+						<a href="javascript:;" class="Submit" id="submitBtn">Submit</a>
+					</form>
+				</div>
+				</div>
+			</div>
+			
+			
+			
+			<div class="van-overlay van-overlay1" style="z-index: 2001;"></div>
+			<div  class="van-popup van-popup--top" style="z-index: 2002;">
+				<div  class="popuBox2">
+					<div  class="tc"><img  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAHKADAAQAAAABAAAAHAAAAABHddaYAAACaklEQVRIDb2Wv2sUURDHZ94dWqQIaS+FIAghlYVCQhBsLS7WKqZTOCSdhVUI+QdslOAVlipYmQNtbCwCKRQSQRCEFIJnfbW3O/nO7O26v++dZ/bBsu/Nm5nP2923875MU5qIMG0+ukbh+DYRb5BIh5g7FiYyRH9IJIfk2u/o4PlnZpa6lFw1aaBu7y4Ae7guV/ll7MynWMAODfZfVYFLgdJ9uEIhvSahq5mEvgOmY3J0hwf97/kQlzdIt3eLAjr6Z5gm1IUih+XKATJPaA5hMEBAK+eXG/JRZJC13ER2yMC6VpcH+x/iieQJ7TUGgb7GehjTG37/Yl0vQj9OVHrXXMhpuScOBrQNot+MaLE0MG1k/pQM0/3EWOgs6n4wBqaiJ7Td6LlBBOFxS/djW9ldv6ky0JyRdeufdwNDWc5+at//bJ5FKQMFxEUVZJ5MM8SiWuEbolw11njDWW1sCog67JJC3AQURT/6LZqATRgK/D0jbynln+6nzBVdHGdtTP3CdaXCpWgW2pLNXlQbx+FW0aHGgrMTQByeRDdr3HJTskrj4CRn9BzKobOT2tN9bjeoAqeyADv11DsZ00tqX1jGOXAJp8Vb/zgwwHImBVQW+DSmb3S984APng1xmv+kZbqHxf7wCVXpoazot4AGwWqPpwfyV97dTU4L7vf/YA98mRqnuZWBZkB7SmgQjEf1wbIm29sXYx+5/3gBpfFGPK64j0zfTNTc7BKD6SNez1MShx0ePkFpXK8AYS1FiZEBamAkoiA1fE7/SpJNjKjVgnL7q2fUWgCq8TxlYinQoKq4mxLCCoybSZD/KPXPACo19FwRwA93AAAAAElFTkSuQmCC" alt="" class="img"> <span >Prompt</span></div>
+					<div  class="txt">
+						1. The transfer amount must be the same as the recharge amount, otherwise the recharge will not be successful.<br/>
+						2. Please complete the recharge within 10 minutes, if it expires, please re-obtain the UPI ID/ Account Number.</br>
+						3. Please do not save the UPI ID or Account Number for recharge, the saved UPI ID or Account Number cannot be recharged successfully.</br>
+						4. If you don't recharge in the correct way, you will be responsible for the consequences.
+						<br/><br/>
+						महत्वपूर्ण संकेत <br/>
+						1. ट्रांसफर राशि टॉप-अप राशि के समान होनी चाहिए, अन्यथा टॉप-अप सफल नहीं होगा। <br/>
+						2. कृपया 10 मिनट के भीतर स्थानांतरण पूरा करें, यदि यह समाप्त हो जाता है, तो कृपया UPI आईडी पुनः प्राप्त करें। <br/>
+						3. कृपया ट्रांसफर के लिए UPI आईडी सेव न करें, सेव किए गए अकाउंट को सफलतापूर्वक रिचार्ज नहीं किया जा सकता है। <br/>
+						4. यदि आप सही तरीके से रिचार्ज नहीं करते हैं, तो आप परिणामों के लिए जिम्मेदार होंगे
+<!-- 						We will provide you with a recipient's account number, -->
+<!-- 						please click <span >I've paid</span> submit Ref No. after the -->
+<!-- 						transfer is successful.<br >If Ref No. is not submitted, -->
+<!-- 						your recharge may not be credited. -->
+					</div>
+					<div  class="btn_div"> Got it </div>
+				</div>
+			</div>
+
+			<div class="van-overlay van-overlay2" style="z-index: 2003;display: none;"></div>
+			<div  class="van-popup van-popup--round van-popup--center" style="width: 31.1rem; z-index: 2004;display: none;">		
+				<div  class="bxo">
+					<div  class="popuBox">
+						<div  class="tc"><img 
+								src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAHKADAAQAAAABAAAAHAAAAABHddaYAAACaklEQVRIDb2Wv2sUURDHZ94dWqQIaS+FIAghlYVCQhBsLS7WKqZTOCSdhVUI+QdslOAVlipYmQNtbCwCKRQSQRCEFIJnfbW3O/nO7O26v++dZ/bBsu/Nm5nP2923875MU5qIMG0+ukbh+DYRb5BIh5g7FiYyRH9IJIfk2u/o4PlnZpa6lFw1aaBu7y4Ae7guV/ll7MynWMAODfZfVYFLgdJ9uEIhvSahq5mEvgOmY3J0hwf97/kQlzdIt3eLAjr6Z5gm1IUih+XKATJPaA5hMEBAK+eXG/JRZJC13ER2yMC6VpcH+x/iieQJ7TUGgb7GehjTG37/Yl0vQj9OVHrXXMhpuScOBrQNot+MaLE0MG1k/pQM0/3EWOgs6n4wBqaiJ7Td6LlBBOFxS/djW9ldv6ky0JyRdeufdwNDWc5+at//bJ5FKQMFxEUVZJ5MM8SiWuEbolw11njDWW1sCog67JJC3AQURT/6LZqATRgK/D0jbynln+6nzBVdHGdtTP3CdaXCpWgW2pLNXlQbx+FW0aHGgrMTQByeRDdr3HJTskrj4CRn9BzKobOT2tN9bjeoAqeyADv11DsZ00tqX1jGOXAJp8Vb/zgwwHImBVQW+DSmb3S984APng1xmv+kZbqHxf7wCVXpoazot4AGwWqPpwfyV97dTU4L7vf/YA98mRqnuZWBZkB7SmgQjEf1wbIm29sXYx+5/3gBpfFGPK64j0zfTNTc7BKD6SNez1MShx0ePkFpXK8AYS1FiZEBamAkoiA1fE7/SpJNjKjVgnL7q2fUWgCq8TxlYinQoKq4mxLCCoybSZD/KPXPACo19FwRwA93AAAAAElFTkSuQmCC"
+								alt="" class="img"> <span >Important reminder</span></div>
+						<div  class="txt"> If you did not click "I've paid" after the payment was successful. Your money may be lost! </div>
+						<div  class="btn_div"> Got it </div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="/staticpay/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/staticpay/js/clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/staticpay/ajax/libs/layer/layer.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+		$('.popuBox2 .btn_div').click(function(){
+			$('.van-popup--top').hide();
+			$('.van-overlay1').hide();
+		})
+		$('.popuBox .btn_div').click(function(){
+			$('.van-popup--center').hide();
+			$('.van-overlay2').hide();
+		})
+		$('#next').click(function(){
+			$('.box1').hide();
+			$('.box3').show();
+		})
+		$('.file').change(function(){
+		  var reads= new FileReader();
+			f = document.getElementById('file').files[0];
+			reads.readAsDataURL(f);
+			reads.onload=function (e) {
+				$("#img").attr("src",this.result);
+				$(".file").hide();
+			};
+		})
+		$("#img").click(function(){
+			$('#file').click();
+		})
+		$("#submitBtn").click(function(){
+			var file = $("#file").val();
+			console.log(file);
+			if(!file){
+				layer.msg("Picture cannot be empty");
+				return;
+			}
+			$("#Submit").click();
+		})
+
+		var clipboard = new Clipboard('.btn');
+		clipboard.on('success', function(e) {
+			// console.log(e);
+			layer.msg('Copy succeeded');
+		});
+		clipboard.on('error', function(e) {
+			// console.log(e);
+			layer.msg('Copy failed, please copy manually');
+		});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysSmsRecordMapper">
+    
+    <resultMap type="SysSmsRecord" id="SysSmsRecordResult">
+        <result property="id"    column="id"    />
+        <result property="content"    column="content"    />
+        <result property="phonenum"    column="phonenum"    />
+        <result property="sensitive"    column="sensitive"    />
+        <result property="channel"    column="channel"    />
+        <result property="resultdata"    column="resultdata"    />
+        <result property="sendstate"    column="sendstate"    />
+        <result property="smstype"    column="smstype"    />
+        <result property="source"    column="source"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectSysSmsRecordVo">
+        select id, content, phonenum, `sensitive`, channel, resultdata, sendstate, smstype,source, create_time from sys_sms_record
+    </sql>
+
+    <select id="selectSysSmsRecordList" parameterType="SysSmsRecord" resultMap="SysSmsRecordResult">
+        <include refid="selectSysSmsRecordVo"/>
+        <where>  
+            <if test="phonenum != null  and phonenum != ''"> and phonenum = #{phonenum}</if>
+            <if test="sendstate != null "> and `sendstate` = #{sendstate}</if>
+            <if test="smstype != null "> and smstype = #{smstype}</if>
+            <if test="source != null and source != ''"> and source = #{source}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectSysSmsRecordById" parameterType="Integer" resultMap="SysSmsRecordResult">
+        <include refid="selectSysSmsRecordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysSmsRecord" parameterType="SysSmsRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_sms_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="content != null  and content != ''">`content`,</if>
+            <if test="phonenum != null  and phonenum != ''">`phonenum`,</if>
+            <if test="sensitive != null  and sensitive != ''">`sensitive`,</if>
+            <if test="channel != null  and channel != ''">channel,</if>
+            <if test="resultdata != null  and resultdata != ''">resultdata,</if>
+            <if test="sendstate != null ">sendstate,</if>
+            <if test="smstype != null ">smstype,</if>
+            <if test="source != null  and source != ''">source,</if>
+            <if test="createTime != null ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="phonenum != null  and phonenum != ''">#{phonenum},</if>
+            <if test="sensitive != null  and sensitive != ''">#{sensitive},</if>
+            <if test="channel != null  and channel != ''">#{channel},</if>
+            <if test="resultdata != null  and resultdata != ''">#{resultdata},</if>
+            <if test="sendstate != null ">#{sendstate},</if>
+            <if test="smstype != null ">#{smstype},</if>
+            <if test="source != null  and source != ''">#{source},</if>
+            <if test="createTime != null ">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysSmsRecord" parameterType="SysSmsRecord">
+        update sys_sms_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="phonenum != null  and phonenum != ''">phonenum = #{phonenum},</if>
+            <if test="sensitive != null  and sensitive != ''">`sensitive` = #{sensitive},</if>
+            <if test="channel != null  and channel != ''">channel = #{channel},</if>
+            <if test="resultdata != null  and resultdata != ''">resultdata = #{resultdata},</if>
+            <if test="sendstate != null ">sendstate = #{sendstate},</if>
+            <if test="smstype != null ">smstype = #{smstype},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysSmsRecordById" parameterType="Integer">
+        delete from sys_sms_record where id = #{id}
+    </delete>
+
+    <delete id="deleteSysSmsRecordByIds" parameterType="String">
+        delete from sys_sms_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

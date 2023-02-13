@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpOnboardMapper">
+    
+    <resultMap type="WpOnboard" id="WpOnboardResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="daily"    column="daily"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpOnboardVo">
+        select t.id, t.uid, t.daily, t.createtime,u.utel 
+        from wp_onboard t
+        left join wp_userinfo u on t.uid=u.uid
+    </sql>
+
+    <select id="selectWpOnboardList" parameterType="WpOnboard" resultMap="WpOnboardResult">
+        <include refid="selectWpOnboardVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="normaltype != null "> and u.`normaltype` = #{normaltype}</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+            <if test="utel != null and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="daily != null "> and t.`daily` = #{daily}</if>
+            <if test="beginDaily != null "> and t.`daily` <![CDATA[ >= ]]> #{beginDaily}</if>
+            <if test="endDaily != null "> and t.`daily` <![CDATA[ <= ]]> #{endDaily}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpOnboardById" parameterType="Integer" resultMap="WpOnboardResult">
+        <include refid="selectWpOnboardVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpOnboard" parameterType="WpOnboard" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_onboard
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="daily != null ">`daily`,</if>
+            <if test="createtime != null  and createtime != ''">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="daily != null ">#{daily},</if>
+            <if test="createtime != null  and createtime != ''">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpOnboard" parameterType="WpOnboard">
+        update wp_onboard
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="daily != null ">`daily` = #{daily},</if>
+            <if test="createtime != null  and createtime != ''">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpOnboardById" parameterType="Integer">
+        delete from wp_onboard where id = #{id}
+    </delete>
+
+    <delete id="deleteWpOnboardByIds" parameterType="String">
+        delete from wp_onboard where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysCheckoutCounterMapper">
+    
+    <resultMap type="SysCheckoutCounter" id="SysCheckoutCounterResult">
+        <result property="id"    column="id"    />
+        <result property="username"    column="username"    />
+        <result property="ifsc"    column="ifsc"    />
+        <result property="bankname"    column="bankname"    />
+        <result property="bankaccount"    column="bankaccount"    />
+        <result property="status"    column="status"    />
+        <result property="paymoney"    column="paymoney"    />
+        <result property="realmoney"    column="realmoney"    />
+        <result property="payurl"    column="payurl"    />
+        <result property="orderid"    column="orderid"    />
+        <result property="transactionid"    column="transactionid"    />
+        <result property="returnurl"    column="returnurl"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+        <result property="reqparam"    column="reqparam"    />
+        <result property="uid"    column="uid"    />
+        <result property="code"    column="code"    />
+    </resultMap>
+
+    <sql id="selectSysCheckoutCounterVo">
+        select t.*,u.utel 
+        from sys_checkout_counter t
+        left join wp_userinfo u on t.uid=u.uid
+    </sql>
+
+    <select id="selectSysCheckoutCounterList" parameterType="SysCheckoutCounter" resultMap="SysCheckoutCounterResult">
+        <include refid="selectSysCheckoutCounterVo"/>
+        <where>  
+            <if test="ifsc != null  and ifsc != ''"> and t.`ifsc` = #{ifsc}</if>
+            <if test="code != null  and code != ''"> and t.`code` = #{code}</if>
+            <if test="bankaccount != null  and bankaccount != ''"> and t.`bankaccount` = #{bankaccount}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="orderid != null  and orderid != ''"> and t.`orderid` = #{orderid}</if>
+            <if test="transactionid != null  and transactionid != ''"> and t.`transactionid` = #{transactionid}</if>
+            <if test="utel != null  and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(t.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectSysCheckoutCounterById" parameterType="Long" resultMap="SysCheckoutCounterResult">
+        <include refid="selectSysCheckoutCounterVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectByOrderid" parameterType="String" resultMap="SysCheckoutCounterResult">
+        <include refid="selectSysCheckoutCounterVo"/>
+        where t.orderid = #{orderid}
+    </select>
+        
+    <insert id="insertSysCheckoutCounter" parameterType="SysCheckoutCounter" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_checkout_counter
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null  and username != ''">`username`,</if>
+            <if test="ifsc != null  and ifsc != ''">`ifsc`,</if>
+            <if test="bankname != null  and bankname != ''">`bankname`,</if>
+            <if test="bankaccount != null  and bankaccount != ''">`bankaccount`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="paymoney != null ">`paymoney`,</if>
+            <if test="realmoney != null ">`realmoney`,</if>
+            <if test="payurl != null  and payurl != ''">`payurl`,</if>
+            <if test="orderid != null  and orderid != ''">`orderid`,</if>
+            <if test="transactionid != null  and transactionid != ''">`transactionid`,</if>
+            <if test="returnurl != null  and returnurl != ''">`returnurl`,</if>
+            <if test="createTime != null ">`create_time`,</if>
+            <if test="updateTime != null ">`update_time`,</if>
+            <if test="updateBy != null ">`update_by`,</if>
+            <if test="remark != null and remark != ''">`remark`,</if>
+            <if test="reqparam != null and reqparam != ''">`reqparam`,</if>
+            <if test="uid != null">`uid`,</if>
+            <if test="code != null and code != ''">`code`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null  and username != ''">#{username},</if>
+            <if test="ifsc != null  and ifsc != ''">#{ifsc},</if>
+            <if test="bankname != null  and bankname != ''">#{bankname},</if>
+            <if test="bankaccount != null  and bankaccount != ''">#{bankaccount},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="paymoney != null ">#{paymoney},</if>
+            <if test="realmoney != null ">#{realmoney},</if>
+            <if test="payurl != null  and payurl != ''">#{payurl},</if>
+            <if test="orderid != null  and orderid != ''">#{orderid},</if>
+            <if test="transactionid != null  and transactionid != ''">#{transactionid},</if>
+            <if test="returnurl != null  and returnurl != ''">#{returnurl},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="updateBy != null ">#{updateBy},</if>
+            <if test="remark != null and remark!='' ">#{remark},</if>
+            <if test="reqparam != null and reqparam != '' ">#{reqparam},</if>
+            <if test="uid != null">#{uid},</if>
+            <if test="code != null and code != '' ">#{code},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysCheckoutCounter" parameterType="SysCheckoutCounter">
+        update sys_checkout_counter
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="username != null  and username != ''">`username` = #{username},</if>
+            <if test="ifsc != null  and ifsc != ''">`ifsc` = #{ifsc},</if>
+            <if test="bankname != null  and bankname != ''">`bankname` = #{bankname},</if>
+            <if test="bankaccount != null  and bankaccount != ''">`bankaccount` = #{bankaccount},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="paymoney != null ">`paymoney` = #{paymoney},</if>
+            <if test="realmoney != null ">`realmoney` = #{realmoney},</if>
+            <if test="payurl != null  and payurl != ''">`payurl` = #{payurl},</if>
+            <if test="orderid != null  and orderid != ''">`orderid` = #{orderid},</if>
+            <if test="transactionid != null  and transactionid != ''">`transactionid` = #{transactionid},</if>
+            <if test="returnurl != null  and returnurl != ''">`returnurl` = #{returnurl},</if>
+            <if test="createTime != null ">`create_time` = #{createTime},</if>
+            <if test="updateTime != null ">`update_time` = #{updateTime},</if>
+            <if test="updateBy != null ">`update_by` = #{updateBy},</if>
+            <if test="remark != null  and remark != ''">`remark` = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysCheckoutCounterById" parameterType="Long">
+        delete from sys_checkout_counter where id = #{id}
+    </delete>
+
+    <delete id="deleteSysCheckoutCounterByIds" parameterType="String">
+        delete from sys_checkout_counter where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

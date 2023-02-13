@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('前端用户列表')" />
+    <th:block th:include="include :: layout-latest-css" />
+    <th:block th:include="include :: ztree-css" />
+</head>
+<body class="gray-bg">
+	<a class="btn btn-warning" onclick="exportExcel()" >
+       <i class="fa fa-download"></i> 导出
+    </a>
+	<div class="ui-layout-west">
+		<div class="box box-main">
+			<div class="ui-layout-content">
+				<div id="tree" class="ztree"></div>
+			</div>
+		</div>
+	</div>
+	<input type="hidden" id="oid" th:value="${oid}">
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: layout-latest-js" />
+    <th:block th:include="include :: ztree-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/userinfo";
+
+        $(function() {
+        	queryDeptTree($("#oid").val());
+        });
+        
+        
+        function queryDeptTree(oid)
+		{
+			var url = prefix + "/treeData/"+oid;
+			var options = {
+		        url: url,
+		        expandLevel: 0
+		    };
+			$.tree.init(options);
+		}
+        function exportExcel(){
+        	$.modal.confirm("确定导出所有吗？", function() {
+    			$.modal.loading("正在导出数据，请稍后...");
+    			$.post(prefix + "/exportLow", {"oid":$("#oid").val()}, function(result) {
+    				if (result.code == 0) {
+    			        window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+    				} else if (result.code == 301) {
+                        $.modal.alertWarning(result.msg)
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+			});
+        }
+    </script>
+</body>
+</html>

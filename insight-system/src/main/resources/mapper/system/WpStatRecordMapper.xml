@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpStatRecordMapper">
+    
+    <resultMap type="WpStatRecord" id="WpStatRecordResult">
+        <result property="id"    column="id"    />
+        <result property="registnum"    column="registnum"    />
+        <result property="giveusernum"    column="giveusernum"    />
+        <result property="giveprice"    column="giveprice"    />
+        <result property="newrechargenum"    column="newrechargenum"    />
+        <result property="newrechargeprice"    column="newrechargeprice"    />
+        <result property="totalrechargenum"    column="totalrechargenum"    />
+        <result property="totalrechargeprice"    column="totalrechargeprice"    />
+        <result property="cashnum"    column="cashnum"    />
+        <result property="cashprice"    column="cashprice"    />
+        <result property="daily"    column="daily"    />
+    </resultMap>
+
+    <sql id="selectWpStatRecordVo">
+        select t.id, t.registnum, t.giveusernum, t.giveprice, t.newrechargenum, t.newrechargeprice, t.totalrechargenum, t.totalrechargeprice, t.cashnum, t.cashprice, t.daily 
+        from wp_stat_record t
+    </sql>
+
+    <select id="selectWpStatRecordList" parameterType="WpStatRecord" resultMap="WpStatRecordResult">
+        <include refid="selectWpStatRecordVo"/>
+        <where>  
+            <if test="daily != null "> and t.`daily` = #{daily}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND t.`daily` &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND t.`daily` &lt;= #{params.endTime}
+			</if>
+        </where>
+    </select>
+    
+<!--     sum(t.totalrechargenum) totalrechargenum, sum(t.totalrechargeprice) totalrechargeprice,  -->
+    <select id="selectWpStatRecordTotal" parameterType="WpStatRecord" resultType="StatRecordTotal">
+        select  sum(t.registnum) registnum, sum(t.giveusernum) giveusernum, sum(t.giveprice) giveprice, sum(t.newrechargenum) rechargenum, 
+        		sum(t.newrechargeprice) rechargeprice,sum(t.cashnum) cashnum, sum(t.cashprice) cashprice
+        from wp_stat_record t
+        <where>  
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND t.`daily` &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND t.`daily` &lt;= #{params.endTime}
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectWpStatRecordById" parameterType="Integer" resultMap="WpStatRecordResult">
+        <include refid="selectWpStatRecordVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectWpStatRecordByDaily" parameterType="Integer" resultMap="WpStatRecordResult">
+        <include refid="selectWpStatRecordVo"/>
+        where t.daily = #{daily}
+    </select>
+        
+    <insert id="insertWpStatRecord" parameterType="WpStatRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_stat_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="registnum != null ">`registnum`,</if>
+            <if test="giveusernum != null ">`giveusernum`,</if>
+            <if test="giveprice != null ">`giveprice`,</if>
+            <if test="newrechargenum != null ">`newrechargenum`,</if>
+            <if test="newrechargeprice != null ">`newrechargeprice`,</if>
+            <if test="totalrechargenum != null ">`totalrechargenum`,</if>
+            <if test="totalrechargeprice != null ">`totalrechargeprice`,</if>
+            <if test="cashnum != null ">`cashnum`,</if>
+            <if test="cashprice != null ">`cashprice`,</if>
+            <if test="daily != null ">`daily`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="registnum != null ">#{registnum},</if>
+            <if test="giveusernum != null ">#{giveusernum},</if>
+            <if test="giveprice != null ">#{giveprice},</if>
+            <if test="newrechargenum != null ">#{newrechargenum},</if>
+            <if test="newrechargeprice != null ">#{newrechargeprice},</if>
+            <if test="totalrechargenum != null ">#{totalrechargenum},</if>
+            <if test="totalrechargeprice != null ">#{totalrechargeprice},</if>
+            <if test="cashnum != null ">#{cashnum},</if>
+            <if test="cashprice != null ">#{cashprice},</if>
+            <if test="daily != null ">#{daily},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpStatRecord" parameterType="WpStatRecord">
+        update wp_stat_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="registnum != null ">`registnum` = #{registnum},</if>
+            <if test="giveusernum != null ">`giveusernum` = #{giveusernum},</if>
+            <if test="giveprice != null ">`giveprice` = #{giveprice},</if>
+            <if test="newrechargenum != null ">`newrechargenum` = #{newrechargenum},</if>
+            <if test="newrechargeprice != null ">`newrechargeprice` = #{newrechargeprice},</if>
+            <if test="totalrechargenum != null ">`totalrechargenum` = #{totalrechargenum},</if>
+            <if test="totalrechargeprice != null ">`totalrechargeprice` = #{totalrechargeprice},</if>
+            <if test="cashnum != null ">`cashnum` = #{cashnum},</if>
+            <if test="cashprice != null ">`cashprice` = #{cashprice},</if>
+            <if test="daily != null ">`daily` = #{daily},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpStatRecordById" parameterType="Integer">
+        delete from wp_stat_record where id = #{id}
+    </delete>
+
+    <delete id="deleteWpStatRecordByIds" parameterType="String">
+        delete from wp_stat_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

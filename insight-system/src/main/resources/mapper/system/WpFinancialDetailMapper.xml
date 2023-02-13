@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpFinancialDetailMapper">
+    
+    <resultMap type="WpFinancialDetail" id="WpFinancialDetailResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="refid"    column="refid"    />
+        <result property="profit"    column="profit"    />
+        <result property="rate"    column="rate"    />
+        <result property="daily"    column="daily"    />
+    </resultMap>
+
+    <sql id="selectWpFinancialDetailVo">
+        select t.id, t.uid, t.refid, t.profit, t.rate, t.daily 
+        from wp_financial_detail t
+    </sql>
+
+    <select id="selectWpFinancialDetailList" parameterType="WpFinancialDetail" resultMap="WpFinancialDetailResult">
+        <include refid="selectWpFinancialDetailVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="refid != null "> and t.`refid` = #{refid}</if>
+            <if test="daily != null "> and t.`daily` = #{daily}</if>
+        </where>
+    </select>
+    
+    <select id="selectFinancialDetailList" parameterType="Integer" resultType="FinancialDetailResp">
+        select t.id, t.uid, t.refid, t.profit, t.rate, t.daily 
+        from wp_financial_detail t
+        where t.`refid` = #{refid}
+        order by t.id desc
+    </select>
+    
+    <select id="selectWpFinancialDetailById" parameterType="Integer" resultMap="WpFinancialDetailResult">
+        <include refid="selectWpFinancialDetailVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectLastProfit" parameterType="Integer" resultType="Double" >
+        select t.profit 
+        from wp_financial_detail t
+        where t.refid = #{refid}
+        order by t.id desc limit 1
+    </select>
+        
+    <insert id="insertWpFinancialDetail" parameterType="WpFinancialDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_financial_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="refid != null ">`refid`,</if>
+            <if test="profit != null ">`profit`,</if>
+            <if test="rate != null ">`rate`,</if>
+            <if test="daily != null ">`daily`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="refid != null ">#{refid},</if>
+            <if test="profit != null ">#{profit},</if>
+            <if test="rate != null ">#{rate},</if>
+            <if test="daily != null ">#{daily},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpFinancialDetail" parameterType="WpFinancialDetail">
+        update wp_financial_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="refid != null ">`refid` = #{refid},</if>
+            <if test="profit != null ">`profit` = #{profit},</if>
+            <if test="rate != null ">`rate` = #{rate},</if>
+            <if test="daily != null ">`daily` = #{daily},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpFinancialDetailById" parameterType="Integer">
+        delete from wp_financial_detail where id = #{id}
+    </delete>
+
+    <delete id="deleteWpFinancialDetailByIds" parameterType="String">
+        delete from wp_financial_detail where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

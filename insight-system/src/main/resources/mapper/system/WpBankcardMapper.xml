@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpBankcardMapper">
+    
+    <resultMap type="WpBankcard" id="WpBankcardResult">
+        <result property="id"    column="id"    />
+        <result property="bankno"    column="bankno"    />
+        <result property="accntnm"    column="accntnm"    />
+        <result property="accntnm2"    column="accntnm2"    />
+        <result property="cityno"    column="cityno"    />
+        <result property="address"    column="address"    />
+        <result property="uid"    column="uid"    />
+        <result property="accntno"    column="accntno"    />
+        <result property="isdelete"    column="isdelete"    />
+        <result property="content"    column="content"    />
+        <result property="phone"    column="phone"    />
+        <result property="scard"    column="scard"    />
+        <result property="provinceid"    column="provinceid"    />
+        <result property="branchname"    column="branchname"    />
+        <result property="bankname2"    column="bankname2"    />
+        <result property="bankaddr"    column="bankaddr"    />
+        <result property="swift"    column="swift"    />
+        <result property="username"    column="username"    />
+        <result property="useraccount"    column="useraccount"    />
+        <result property="currency"    column="currency"    />
+        <result property="useraddr"    column="useraddr"    />
+        <result property="cryptocurrency"    column="cryptocurrency"    />
+        <result property="walletaddr"    column="walletaddr"    />
+        <result property="paypal"    column="paypal"    />
+        <result property="utel"    column="utel"    />
+    </resultMap>
+
+    <sql id="selectWpBankcardVo">
+        select t.id, t.bankno, t.accntnm, t.accntnm2, t.cityno, t.address, t.uid, t.accntno, t.isdelete, t.content, t.phone, t.scard, t.provinceid, t.branchname, 
+        	t.bankname2, t.bankaddr, t.swift, t.username, t.useraccount, t.currency, t.useraddr, t.cryptocurrency, t.walletaddr, t.paypal,u.utel 
+        from wp_bankcard t
+        left join wp_userinfo u on u.uid=t.uid
+    </sql>
+
+    <select id="selectWpBankcardList" parameterType="WpBankcard" resultMap="WpBankcardResult">
+        <include refid="selectWpBankcardVo"/>
+        <where>  
+            <if test="bankno != null  and bankno != ''"> and t.`bankno` = #{bankno}</if>
+            <if test="utel != null  and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="accntnm != null  and accntnm != ''"> and t.`accntnm` = #{accntnm}</if>
+            <if test="accntnm2 != null  and accntnm2 != ''"> and t.`accntnm2` = #{accntnm2}</if>
+            <if test="cityno != null  and cityno != ''"> and t.`cityno` = #{cityno}</if>
+            <if test="address != null  and address != ''"> and t.`address` = #{address}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="normaltype != null "> and u.`normaltype` = #{normaltype}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+            <if test="accntno != null  and accntno != ''"> and t.`accntno` = #{accntno}</if>
+            <if test="branchname != null  and branchname != ''"> and t.`branchname` = #{branchname}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpBankcardById" parameterType="Long" resultMap="WpBankcardResult">
+        <include refid="selectWpBankcardVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectBankByUid" parameterType="Integer" resultMap="WpBankcardResult">
+        <include refid="selectWpBankcardVo"/>
+        where t.uid = #{uid}
+    </select>
+        
+    <insert id="insertWpBankcard" parameterType="WpBankcard" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_bankcard
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bankno != null  and bankno != ''">`bankno`,</if>
+            <if test="accntnm != null  and accntnm != ''">`accntnm`,</if>
+            <if test="accntnm2 != null  and accntnm2 != ''">`accntnm2`,</if>
+            <if test="cityno != null  and cityno != ''">`cityno`,</if>
+            <if test="address != null  and address != ''">`address`,</if>
+            <if test="uid != null ">`uid`,</if>
+            <if test="accntno != null  and accntno != ''">`accntno`,</if>
+            <if test="isdelete != null ">`isdelete`,</if>
+            <if test="content != null  and content != ''">`content`,</if>
+            <if test="phone != null  and phone != ''">`phone`,</if>
+            <if test="scard != null  and scard != ''">`scard`,</if>
+            <if test="provinceid != null ">`provinceid`,</if>
+            <if test="branchname != null  and branchname != ''">`branchname`,</if>
+            <if test="bankname2 != null  and bankname2 != ''">`bankname2`,</if>
+            <if test="bankaddr != null  and bankaddr != ''">`bankaddr`,</if>
+            <if test="swift != null  and swift != ''">`swift`,</if>
+            <if test="username != null  and username != ''">`username`,</if>
+            <if test="useraccount != null  and useraccount != ''">`useraccount`,</if>
+            <if test="currency != null  and currency != ''">`currency`,</if>
+            <if test="useraddr != null  and useraddr != ''">`useraddr`,</if>
+            <if test="cryptocurrency != null  and cryptocurrency != ''">`cryptocurrency`,</if>
+            <if test="walletaddr != null  and walletaddr != ''">`walletaddr`,</if>
+            <if test="paypal != null  and paypal != ''">`paypal`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bankno != null  and bankno != ''">#{bankno},</if>
+            <if test="accntnm != null  and accntnm != ''">#{accntnm},</if>
+            <if test="accntnm2 != null  and accntnm2 != ''">#{accntnm2},</if>
+            <if test="cityno != null  and cityno != ''">#{cityno},</if>
+            <if test="address != null  and address != ''">#{address},</if>
+            <if test="uid != null ">#{uid},</if>
+            <if test="accntno != null  and accntno != ''">#{accntno},</if>
+            <if test="isdelete != null ">#{isdelete},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="phone != null  and phone != ''">#{phone},</if>
+            <if test="scard != null  and scard != ''">#{scard},</if>
+            <if test="provinceid != null ">#{provinceid},</if>
+            <if test="branchname != null  and branchname != ''">#{branchname},</if>
+            <if test="bankname2 != null  and bankname2 != ''">#{bankname2},</if>
+            <if test="bankaddr != null  and bankaddr != ''">#{bankaddr},</if>
+            <if test="swift != null  and swift != ''">#{swift},</if>
+            <if test="username != null  and username != ''">#{username},</if>
+            <if test="useraccount != null  and useraccount != ''">#{useraccount},</if>
+            <if test="currency != null  and currency != ''">#{currency},</if>
+            <if test="useraddr != null  and useraddr != ''">#{useraddr},</if>
+            <if test="cryptocurrency != null  and cryptocurrency != ''">#{cryptocurrency},</if>
+            <if test="walletaddr != null  and walletaddr != ''">#{walletaddr},</if>
+            <if test="paypal != null  and paypal != ''">#{paypal},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpBankcard" parameterType="WpBankcard">
+        update wp_bankcard
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bankno != null  and bankno != ''">`bankno` = #{bankno},</if>
+            <if test="accntnm != null  and accntnm != ''">`accntnm` = #{accntnm},</if>
+            <if test="accntnm2 != null  and accntnm2 != ''">`accntnm2` = #{accntnm2},</if>
+            <if test="cityno != null  and cityno != ''">`cityno` = #{cityno},</if>
+            <if test="address != null  and address != ''">`address` = #{address},</if>
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="accntno != null  and accntno != ''">`accntno` = #{accntno},</if>
+            <if test="isdelete != null ">`isdelete` = #{isdelete},</if>
+            <if test="content != null  and content != ''">`content` = #{content},</if>
+            <if test="phone != null  and phone != ''">`phone` = #{phone},</if>
+            <if test="scard != null  and scard != ''">`scard` = #{scard},</if>
+            <if test="provinceid != null ">`provinceid` = #{provinceid},</if>
+            <if test="branchname != null  and branchname != ''">`branchname` = #{branchname},</if>
+            <if test="bankname2 != null  and bankname2 != ''">`bankname2` = #{bankname2},</if>
+            <if test="bankaddr != null  and bankaddr != ''">`bankaddr` = #{bankaddr},</if>
+            <if test="swift != null  and swift != ''">`swift` = #{swift},</if>
+            <if test="username != null  and username != ''">`username` = #{username},</if>
+            <if test="useraccount != null  and useraccount != ''">`useraccount` = #{useraccount},</if>
+            <if test="currency != null  and currency != ''">`currency` = #{currency},</if>
+            <if test="useraddr != null  and useraddr != ''">`useraddr` = #{useraddr},</if>
+            <if test="cryptocurrency != null  and cryptocurrency != ''">`cryptocurrency` = #{cryptocurrency},</if>
+            <if test="walletaddr != null  and walletaddr != ''">`walletaddr` = #{walletaddr},</if>
+            <if test="paypal != null  and paypal != ''">`paypal` = #{paypal},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpBankcardById" parameterType="Long">
+        delete from wp_bankcard where id = #{id}
+    </delete>
+
+    <delete id="deleteWpBankcardByIds" parameterType="String">
+        delete from wp_bankcard where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

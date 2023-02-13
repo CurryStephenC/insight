@@ -1,0 +1,2 @@
+Application Version: ${wjyoption.version}
+Spring Boot Version: ${spring-boot.version}

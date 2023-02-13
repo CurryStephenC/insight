@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改销售统计')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-topstat-edit" th:object="${wpTopStat}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">销售ID：</label>
+                <div class="col-sm-8">
+                    <input name="uid" th:field="*{uid}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">销售号码：</label>
+                <div class="col-sm-8">
+                    <input name="utel" th:field="*{utel}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">注册总人数：</label>
+                <div class="col-sm-8">
+                    <input name="registnum" th:field="*{registnum}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">一级客户数：</label>
+                <div class="col-sm-8">
+                    <input name="level1num" th:field="*{level1num}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">二级客户数：</label>
+                <div class="col-sm-8">
+                    <input name="level2num" th:field="*{level2num}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">三级客户数：</label>
+                <div class="col-sm-8">
+                    <input name="level3num" th:field="*{level3num}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">一级用户充值金额：</label>
+                <div class="col-sm-8">
+                    <input name="level1rechargeprice" th:field="*{level1rechargeprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">二级用户充值金额：</label>
+                <div class="col-sm-8">
+                    <input name="level2rechargeprice" th:field="*{level2rechargeprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">三级用户充值金额：</label>
+                <div class="col-sm-8">
+                    <input name="level3rechargeprice" th:field="*{level3rechargeprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">一级用户提现金额：</label>
+                <div class="col-sm-8">
+                    <input name="level1cashprice" th:field="*{level1cashprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">二级用户提现金额：</label>
+                <div class="col-sm-8">
+                    <input name="level2cashprice" th:field="*{level2cashprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">三级用户提现金额：</label>
+                <div class="col-sm-8">
+                    <input name="level3cashprice" th:field="*{level3cashprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">充值人数：</label>
+                <div class="col-sm-8">
+                    <input name="totalrechargenum" th:field="*{totalrechargenum}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">充值金额：</label>
+                <div class="col-sm-8">
+                    <input name="totalrechargeprice" th:field="*{totalrechargeprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">当天提现人数：</label>
+                <div class="col-sm-8">
+                    <input name="cashnum" th:field="*{cashnum}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">当天提现金额：</label>
+                <div class="col-sm-8">
+                    <input name="cashprice" th:field="*{cashprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">新增IB数：</label>
+                <div class="col-sm-8">
+                    <input name="ibnum" th:field="*{ibnum}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">统计日期：</label>
+                <div class="col-sm-8">
+                    <input name="daily" th:field="*{daily}" class="form-control" type="text" required>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/topstat";
+        $("#form-topstat-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-topstat-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

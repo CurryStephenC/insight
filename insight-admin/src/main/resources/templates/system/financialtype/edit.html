@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改理财类型')" />
+    <th:block th:include="include :: jasny-bootstrap-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-financialtype-edit" th:object="${wpFinancialType}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">类型：</label>
+                <div class="col-sm-8">
+                    <select name="type" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_type_type')}" required>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{isnormal}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">状态：</label>
+                <div class="col-sm-8">
+                    <select name="status" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_type_status')}" required>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{status}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">是否正常：</label>
+                <div class="col-sm-8">
+                    <select name="isnormal" class="form-control m-b" th:with="type=${@dict.getType('wp_userinfo_normal')}" required>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{isnormal}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">名称：</label>
+                <div class="col-sm-8">
+                    <input name="name" th:field="*{name}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">利率：</label>
+                <div class="col-sm-8">
+                    <input name="rete" th:field="*{rete}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">最小购买金额：</label>
+                <div class="col-sm-8">
+                    <input name="minbuymoney" th:field="*{minbuymoney}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">最大购买金额：</label>
+                <div class="col-sm-8">
+                    <input name="maxbuymoney" th:field="*{maxbuymoney}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">折扣：</label>
+                <div class="col-sm-8">
+                    <input name="rebate" th:field="*{rebate}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">冻结天数：</label>
+                <div class="col-sm-8">
+                    <input name="freezedate" th:field="*{freezedate}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">是否火热1：火热：</label>
+                <div class="col-sm-8">
+                    <input name="ishot" th:field="*{ishot}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">红包最高占比：</label>
+                <div class="col-sm-8">
+                    <input name="redpercent" th:field="*{redpercent}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">排序：</label>
+                <div class="col-sm-8">
+                    <input name="orderby" th:field="*{orderby}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">手动赎回扣款比例：</label>
+                <div class="col-sm-8">
+                    <input name="feerate" th:field="*{feerate}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">能否手动赎回：</label>
+                <div class="col-sm-8">
+                    <select name="canover" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_over')}" required>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{canover}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">备注：</label>
+                <div class="col-sm-8">
+                    <textarea name="remark" class="form-control">[[*{remark}]]</textarea>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">图片地址：</label>
+                <div class="col-sm-8">
+                	<div class="fileinput fileinput-new" data-provides="fileinput">
+				        <div class="fileinput-new thumbnail" style="width: 140px; height: 140px;">
+				          <img th:src="*{picurl}" >
+				        </div>
+				        <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+				        <div>
+				          <span class="btn btn-white btn-file"><span class="fileinput-new">选择图片</span><span class="fileinput-exists">更改</span><input id="file" type="file"></span>
+				        </div>
+			      	</div>
+                    <input id="picurl" name="picurl" class="form-control" type="text" th:field="*{picurl}" readonly="readonly">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: jasny-bootstrap-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/financialtype";
+        $("#form-financialtype-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-financialtype-edit').serialize());
+            }
+        }
+        $('#file').on('change', function() {
+			$("#picurl").val('');
+        	if(this.files.length == 0){
+        		return;
+        	}
+            var formdata = new FormData();
+            formdata.append("file", this.files[0]);
+            $.ajax({
+                url: ctx + "common/upload",
+                data: formdata,
+                type: "post",
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                	console.log(result);
+                	if(result.code == 0){
+                		$("#picurl").val(result.url);
+                	}
+                }
+            })
+        })
+    </script>
+</body>
+</html>

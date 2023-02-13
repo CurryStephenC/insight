@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('前端用户列表')" />
+    <th:block th:include="include :: layout-latest-css" />
+    <th:block th:include="include :: ztree-css" />
+</head>
+<body class="gray-bg">
+	<div class="ui-layout-west">
+		<div class="box box-main">
+			<div class="ui-layout-content">
+				<div id="tree" class="ztree"></div>
+			</div>
+		</div>
+	</div>
+	<div class="ui-layout-center">
+	     <div class="container-div">
+	        <div class="row">
+	            <div class="col-sm-12 search-collapse">
+	                <form id="formId">
+	                    <div class="select-list">
+	                        <ul>
+	                            <li>
+	                                <p>电话号码：</p>
+	                                <input type="text" name="utel"/>
+	                            </li>
+	                            <li>
+	                                <p>上级：</p>
+	                                <input type="text" name="outel" id="outel"/>
+	                            </li>
+	                            <li>
+	                                <p>销售：</p>
+	                                <input type="text" name="toputel"/>
+	                            </li>
+	                            <li>
+	                                <p>邮箱：</p>
+	                                <input type="text" name="email"/>
+	                            </li>
+	                            <li>
+	                                <p>身份：</p>
+	                                <select name="otype" th:with="type=${@dict.getType('wp_userinfo_otype')}">
+	                                    <option value="">所有</option>
+	                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+	                                </select>
+	                            </li>
+	                            <li>
+	                                <p>状态：</p>
+	                                <select name="ustatus" th:with="type=${@dict.getType('sys_user_status')}">
+	                                    <option value="">所有</option>
+	                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+	                                </select>
+	                            </li>
+	                            <li>
+	                                <p>正常用户：</p>
+	                                <select name="normaltype" th:with="type=${@dict.getType('wp_userinfo_normal')}">
+	                                    <option value="">所有</option>
+	                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+	                                </select>
+	                            </li>
+	<!--                             <li> -->
+	<!--                                 <p>是否为顶级：</p> -->
+	<!--                                 <select name="istop" th:with="type=${@dict.getType('wp_userinfo_istop')}"> -->
+	<!--                                     <option value="">所有</option> -->
+	<!--                                     <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option> -->
+	<!--                                 </select> -->
+	<!--                             </li> -->
+	                            <li>
+	                                <p>IB状态：</p>
+	                                <select name="ibstatus" th:with="type=${@dict.getType('wp_userinfo_ib')}">
+	                                    <option value="">所有</option>
+	                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+	                                </select>
+	                            </li>
+	                            <li class="select-time">
+	                                <p>注册日期：</p>
+	                                <input type="text" class="time-input" placeholder="开始时间" name="params[beginTime]" data-format="yyyyMMdd"/>
+	                                <span>-</span>
+	                                <input type="text" class="time-input" placeholder="结束时间" name="params[endTime]" data-format="yyyyMMdd"/>
+	                            </li>
+	                            <li class="select-time">
+	                                <p>登录日期：</p>
+	                                <input type="text" class="time-input" placeholder="开始时间" name="params[loginbeginTime]" data-format="yyyyMMdd"/>
+	                                <span>-</span>
+	                                <input type="text" class="time-input" placeholder="结束时间" name="params[loginendTime]" data-format="yyyyMMdd"/>
+	                            </li>
+	                            <li>
+	                                <a class="btn btn-primary btn-rounded btn-sm" onclick="init()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+	                                <a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+	                            </li>
+	                        </ul>
+	                    </div>
+	                </form>
+	            </div>
+	
+	            <div class="btn-group-sm" id="toolbar" role="group">
+	                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:userinfo:add">
+	                    <i class="fa fa-plus"></i> 添加
+	                </a>
+	<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:userinfo:edit">
+	                    <i class="fa fa-edit"></i> 修改
+	                </a>
+	                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:userinfo:remove">
+	                    <i class="fa fa-remove"></i> 删除
+	                </a> -->
+	                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:userinfo:export">
+	                    <i class="fa fa-download"></i> 导出
+	                 </a>
+	                 <p>
+                 	<input type="text" readonly="readonly" disabled="disabled" id="todayUserNum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="yesUserNum">
+                 </p>
+	            </div>
+	            <div class="col-sm-12 select-table table-striped">
+	                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+	            </div>
+	        </div>
+	    </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: layout-latest-js" />
+    <th:block th:include="include :: ztree-js" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:userinfo:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:userinfo:remove')}]];
+        var statusFlag = [[${@permission.hasPermi('system:userinfo:status')}]];
+        var freezeFlag = [[${@permission.hasPermi('system:userinfo:freeze')}]];
+        var lowerFlag = [[${@permission.hasPermi('system:userinfo:lower')}]];
+        var otypeDatas = [[${@dict.getType('wp_userinfo_otype')}]];
+        var ustatusDatas = [[${@dict.getType('sys_user_status')}]];
+        var normaltypeDatas = [[${@dict.getType('wp_userinfo_normal')}]];
+        var istopDatas = [[${@dict.getType('wp_userinfo_istop')}]];
+        var ibstatusDatas = [[${@dict.getType('wp_userinfo_ib')}]];
+        var prefix = ctx + "system/userinfo";
+
+        $(function() {
+        	var panehHidden = false;
+		    if ($(this).width() < 769) {
+		        panehHidden = true;
+		    }
+		    $('body').layout({ initClosed: panehHidden, west__size: 185 });
+		    queryList();
+        	total();
+        	queryDeptTree();
+        });
+        
+        function init(){
+        	$.table.search()
+        	total();
+        }
+        
+        function reset(){
+        	$.form.reset();
+        	total();
+        }
+        
+        function total(){
+        	var config = {
+       	        url: prefix + "/listTotal",
+       	        type: "post",
+       	        dataType: "json",
+       	        data: {},
+       	        success: function(result) {
+       	        	if(result.data){
+       	        		$("#todayUserNum").val("今日新增："+result.data.todayUserNum )
+       	        		$("#yesUserNum").val("昨日新增："+ result.data.yesUserNum)
+       	        	}else{
+       	        		$("#todayUserNum").val("今日新增：0")
+       	        		$("#yesUserNum").val("昨日新增：0")
+       	        	}
+       	        }
+       	    };
+       	    $.ajax(config)
+        }
+        
+        function queryList(){
+        	var options = {
+                    url: prefix + "/list",
+                    showColumns:true,
+                    showSearch:true,
+                    createUrl: prefix + "/add",
+                    updateUrl: prefix + "/edit/{id}",
+                    removeUrl: prefix + "/remove",
+                    exportUrl: prefix + "/export",
+                    modalName: "前端用户",
+                    sortName: "uid",
+    		        sortOrder: "desc",
+    		        showPageGo: true,
+                    columns: [{
+                        checkbox: true
+                    },
+                    {
+                        field : 'uid', 
+                        title : '用户ID'
+                    },
+                    {
+                        field : 'utel', 
+                        title : '客户手机',
+                        formatter: function(value,row,index){
+                        	var _html = value + "<br/>";
+                        	_html += '<a class="btn btn-primary btn-rounded btn-xs ' + lowerFlag + '" href="javascript:void(0)" onclick="queryOidTree(\'' + row.uid + '\')"><i class="fa fa-search"></i>查看下级</a>';
+                        	return _html;
+                        }
+                    },
+                    {
+                        field : 'email', 
+                        title : '邮箱'
+                    },
+                    {
+                        field : 'utime', 
+                        title : '注册时间',
+                        formatter: function(value,row,index){
+                        	return $.common.formatDate(value);
+                        }
+                    },
+                    {
+                        field : 'lastlog', 
+                        title : '最近登录',
+                        formatter: function(value,row,index){
+                        	return $.common.formatDate(value);
+                        }
+                    },
+                    {
+                        field : 'redmoney', 
+                        title : '红包'
+                    },
+                    {
+                        field : 'usermoney', 
+                        title : '用户余额'
+                    },
+                    {
+                        field : 'otype', 
+                        title : '身份',
+                        formatter: function(value, row, index) {
+                           return $.table.selectDictLabel(otypeDatas, value);
+                        }
+                    },
+                    {
+                        field : 'outel', 
+                        title : '上级'
+                    },
+                    {
+                        field : 'toputel', 
+                        title : '销售'
+                    },
+                    {
+                        field : 'ustatus', 
+                        title : '状态',
+                        formatter: function(value, row, index) {
+                           return $.table.selectDictLabel(ustatusDatas, value);
+                        }
+                    },
+                    {
+                        field : 'normaltype', 
+                        title : '用户类型',
+                        formatter: function(value, row, index) {
+                           return $.table.selectDictLabel(normaltypeDatas, value);
+                        }
+                    },
+                    {
+                        field : 'ibstatus', 
+                        title : 'ib身份',
+                        formatter: function(value, row, index) {
+                           return $.table.selectDictLabel(ibstatusDatas, value);
+                        }
+                    },
+                    {
+                        field : 'comenewtask', 
+                        title : '新手任务',
+                        visible: false,
+                        formatter: function(value, row, index) {
+                        	return value == 0 ? "不是" : "是";
+                        }
+                    },
+                    {
+                        title: '操作',
+                        align: 'center',
+                        formatter: function(value, row, index) {
+                            var actions = [];
+                            var msg = "解冻";
+                            if(row.ustatus==0){
+                            	msg = "禁用";
+                            }
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.uid + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                            actions.push('<a class="btn btn-success btn-xs ' + statusFlag + '" href="javascript:void(0)" onclick="updateStatus(\'' + row.uid + '\')"><i class="fa fa-edit"></i>'+msg+'</a> ');
+                            actions.push('<a class="btn btn-success btn-xs ' + freezeFlag + '" href="javascript:void(0)" onclick="freeze(\'' + row.uid + '\')"><i class="fa fa-edit"></i>一键冻结</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.uid + '\')"><i class="fa fa-remove"></i>删除</a>');
+                            return actions.join('');
+                        }
+                    }]
+                };
+                $.table.init(options);
+        }
+        
+        
+        function queryDeptTree()
+		{
+			var url = prefix + "/treeData";
+			var options = {
+		        url: url,
+		        expandLevel: 0
+		        ,showNum : true
+		        ,onClick : zOnClick
+		    };
+			$.tree.init(options);
+			
+			function zOnClick(event, treeId, treeNode) {
+				$("#outel").val(treeNode.title);
+				$.table.search();
+			}
+		}
+        
+        function queryOidTree(oid)
+		{
+        	$.modal.open("下级", prefix + "/lower/"+oid);
+		}
+        
+        function updateStatus(id,status){
+        	var msg = "确定冻结吗？";
+        	if(status == 0){
+        		msg = "确定解冻吗？";
+        	}
+        	$.modal.confirm(msg,
+              	function(){
+  	        		$.post(prefix + "/status", {"uid":id}, function(result) {
+  	    				if (result.code == 0) {
+  	    					$.modal.msgSuccess("Success");
+  	    					$.table.refresh();
+  	                    } else {
+  	    					$.modal.alertError(result.msg);
+  	    				}
+  	    				$.modal.closeLoading();
+  	    			});
+              	});
+        }
+        function freeze(id){
+        	$.modal.confirm("确定冻结用户及下级用户吗？",
+              	function(){
+  	        		$.post(prefix + "/freeze", {"uid":id}, function(result) {
+  	    				if (result.code == 0) {
+  	    					$.modal.msgSuccess("Success");
+  	    					$.table.refresh();
+  	                    } else {
+  	    					$.modal.alertError(result.msg);
+  	    				}
+  	    				$.modal.closeLoading();
+  	    			});
+              	});
+        }
+    </script>
+</body>
+</html>

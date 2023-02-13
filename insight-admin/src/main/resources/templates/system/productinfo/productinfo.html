@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('产品列表列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>标题：</p>
+                                <input type="text" name="ptitle"/>
+                            </li>
+                            <li>
+                                <p>产品代码：</p>
+                                <input type="text" name="procode"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:productinfo:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:productinfo:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:productinfo:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a> -->
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:productinfo:export">
+                    <i class="fa fa-download"></i> 导出
+                 </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:productinfo:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:productinfo:remove')}]];
+        var prefix = ctx + "system/productinfo";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                showColumns:false,
+                showSearch:true,
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "产品列表",
+                sortName: "pid",
+		        sortOrder: "desc",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'pid', 
+                    title : '主键ID',
+                    visible: false
+                },
+                {
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                 	    return $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field : 'ptitle', 
+                    title : '标题'
+                },
+                {
+                    field : 'cid', 
+                    title : '产品分类id'
+                },
+                {
+                    field : 'otid', 
+                    title : '开市方案id'
+                },
+                {
+                    field : 'isopen', 
+                    title : '开市'
+                },
+                {
+                    field : 'pointLow', 
+                    title : '波动最小值'
+                },
+                {
+                    field : 'pointTop', 
+                    title : '波动最大值'
+                },
+                {
+                    field : 'rands', 
+                    title : '随机波动范围'
+                },
+                {
+                    field : 'content', 
+                    title : '备注'
+                },
+                {
+                    field : 'time', 
+                    title : '添加时间',
+                    formatter: function(value,row,index){
+                    	return $.common.formatDate(value);
+                    }
+                },
+                {
+                    field : 'isdelete', 
+                    title : '状态',
+                    formatter: function(value,row,index){
+                    	if(value == 0){
+                    		return "上架";
+                    	}else{
+                    		return "下架";
+                    	}
+                    }
+                },
+                {
+                    field : 'procode', 
+                    title : '产品代码'
+                },
+                {
+                    field : 'addData', 
+                    title : '除汇率以外的算法'
+                },
+                {
+                    field : 'protime', 
+                    title : '时间玩法间隔'
+                },
+                {
+                    field : 'propoint', 
+                    title : '点位玩法间隔'
+                },
+                {
+                    field : 'proscale', 
+                    title : '盈亏比例'
+                },
+                {
+                    field : 'proorder', 
+                    title : '排序'
+                },
+                {
+                    field : 'icon', 
+                    title : 'ICON',
+                    formatter: function(value, row, index) {
+                    	if(value){
+			    			return $.table.imageView(value,null,600);
+                    	}else{
+                    		return "";
+                    	}
+				    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.pid + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.pid + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

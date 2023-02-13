@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpUserNovicetaskRateMapper">
+    
+    <resultMap type="WpUserNovicetaskRate" id="WpUserNovicetaskRateResult">
+        <result property="id"    column="id"    />
+        <result property="taskid"    column="taskid"    />
+        <result property="uid"    column="uid"    />
+        <result property="status"    column="status"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="finishtime"    column="finishtime"    />
+        <result property="utel"    column="utel"    />
+        <result property="title"    column="title"    />
+        <result property="topid"    column="topid"    />
+        <result property="toputel"    column="toputel"    />
+    </resultMap>
+
+    <sql id="selectWpUserNovicetaskRateVo">
+        select t.id, t.taskid, t.uid, t.status, t.picurl, t.createtime, t.finishtime,u.utel,task.title,tu.utel toputel,u.topid 
+        from wp_user_novicetask_rate t
+        left join wp_userinfo u on t.uid=u.uid
+        left join wp_userinfo tu on tu.uid=u.topid
+        left join wp_user_novicetask task on task.id=t.taskid
+    </sql>
+
+    <select id="selectWpUserNovicetaskRateList" parameterType="WpUserNovicetaskRate" resultMap="WpUserNovicetaskRateResult">
+        <include refid="selectWpUserNovicetaskRateVo"/>
+        <where>  
+            <if test="taskid != null "> and t.`taskid` = #{taskid}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="utel != null and utel != '' "> and u.`utel` = #{utel}</if>
+            <if test="toputel != null and toputel != '' "> and tu.`utel` = #{toputel}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectUserNovicetaskList" parameterType="WpUserNovicetaskRate" resultType="UserNovicetaskResp">
+        SELECT t.`id`,t.`title`,t.`orderby`,t.`reward`,IFNULL(u.`status`,1) AS 'status',u.`picurl`,u.`finishtime`,u.id as rateid
+		FROM wp_user_novicetask t
+		LEFT JOIN wp_user_novicetask_rate u ON t.`id`=u.`taskid` AND u.`uid`=#{uid}
+		WHERE t.status=0
+		ORDER BY t.`orderby`
+    </select>
+    
+    <select id="selectWpUserNovicetaskRateById" parameterType="Integer" resultMap="WpUserNovicetaskRateResult">
+        <include refid="selectWpUserNovicetaskRateVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectWpUserNovicetaskRateByTaskidUid" resultMap="WpUserNovicetaskRateResult">
+        <include refid="selectWpUserNovicetaskRateVo"/>
+        where t.uid = #{arg0} and t.taskid= #{arg1}
+    </select>
+        
+    <insert id="insertWpUserNovicetaskRate" parameterType="WpUserNovicetaskRate" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_user_novicetask_rate
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskid != null ">`taskid`,</if>
+            <if test="uid != null ">`uid`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="picurl != null  and picurl != ''">`picurl`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+            <if test="finishtime != null ">`finishtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskid != null ">#{taskid},</if>
+            <if test="uid != null ">#{uid},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="picurl != null  and picurl != ''">#{picurl},</if>
+            <if test="createtime != null ">#{createtime},</if>
+            <if test="finishtime != null ">#{finishtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpUserNovicetaskRate" parameterType="WpUserNovicetaskRate">
+        update wp_user_novicetask_rate
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskid != null ">`taskid` = #{taskid},</if>
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="picurl != null  and picurl != ''">`picurl` = #{picurl},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+            <if test="finishtime != null ">`finishtime` = #{finishtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpUserNovicetaskRateById" parameterType="Long">
+        delete from wp_user_novicetask_rate where id = #{id}
+    </delete>
+
+    <delete id="deleteWpUserNovicetaskRateByIds" parameterType="String">
+        delete from wp_user_novicetask_rate where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

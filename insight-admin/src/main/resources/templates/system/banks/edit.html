@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改银行信息')" />
+    <th:block th:include="include :: jasny-bootstrap-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-banks-edit" th:object="${sysBanks}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">名称：</label>
+                <div class="col-sm-8">
+                    <input name="bankName" th:field="*{bankName}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">是否显示：</label>
+                <div class="col-sm-8">
+                    <select name="isShow" class="form-control m-b" th:with="type=${@dict.getType('sys_show_hide')}" required>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{isShow}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">icon：</label>
+                <div class="col-sm-8">
+                	<div class="fileinput fileinput-new" data-provides="fileinput">
+				        <div class="fileinput-new thumbnail" style="width: 140px; height: 140px;">
+				          <img th:src="*{bankIcon}" >
+				        </div>
+				        <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+				        <div>
+				          <span class="btn btn-white btn-file"><span class="fileinput-new">选择图片</span><span class="fileinput-exists">更改</span><input id="file" type="file"></span>
+				        </div>
+			      	</div>
+                    <input id="bankIcon" name="bankIcon" class="form-control" type="text" th:field="*{bankIcon}" readonly="readonly">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: jasny-bootstrap-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/banks";
+        $("#form-banks-edit").validate({
+            focusCleanup: true
+        });
+        
+        $('#file').on('change', function() {
+			$("#bankIcon").val('');
+        	if(this.files.length == 0){
+        		return;
+        	}
+            var formdata = new FormData();
+            formdata.append("file", this.files[0]);
+            $.ajax({
+                url: ctx + "common/upload",
+                data: formdata,
+                type: "post",
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                	console.log(result);
+                	if(result.code == 0){
+                		$("#bankIcon").val(result.url);
+                	}
+                }
+            })
+        })
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-banks-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

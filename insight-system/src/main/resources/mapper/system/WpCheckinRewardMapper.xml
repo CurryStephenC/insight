@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpCheckinRewardMapper">
+    
+    <resultMap type="WpCheckinReward" id="WpCheckinRewardResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="times"    column="times"    />
+        <result property="money"    column="money"    />
+        <result property="sort"    column="sort"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpCheckinRewardVo">
+        select t.id, t.name, t.times, t.money, t.sort, t.createtime from wp_checkin_reward t
+    </sql>
+
+    <select id="selectWpCheckinRewardList" parameterType="WpCheckinReward" resultMap="WpCheckinRewardResult">
+        <include refid="selectWpCheckinRewardVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and t.`name` like concat('%', #{name}, '%')</if>
+            <if test="times != null "> and t.`times` = #{times}</if>
+            <if test="money != null "> and t.`money` = #{money}</if>
+            <if test="sort != null "> and t.`sort` = #{sort}</if>
+            <if test="createtime != null  and createtime != ''"> and t.`createtime` = #{createtime}</if>
+        </where>
+    </select>
+    <select id="selectMyCheckinRewardList" parameterType="Integer" resultType="CheckinRewardUserResp">
+        select u.id,t.name,t.times,t.money,u.status 
+        from wp_checkin_reward t
+        left join wp_checkin_reward_user u on t.id = u.refid and u.`uid` = #{uid}
+        order by t.sort
+    </select>
+    
+    <select id="selectWpCheckinRewardById" parameterType="Integer" resultMap="WpCheckinRewardResult">
+        <include refid="selectWpCheckinRewardVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpCheckinReward" parameterType="WpCheckinReward" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_checkin_reward
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">`name`,</if>
+            <if test="times != null ">`times`,</if>
+            <if test="money != null ">`money`,</if>
+            <if test="sort != null ">`sort`,</if>
+            <if test="createtime != null  and createtime != ''">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="times != null ">#{times},</if>
+            <if test="money != null ">#{money},</if>
+            <if test="sort != null ">#{sort},</if>
+            <if test="createtime != null  and createtime != ''">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpCheckinReward" parameterType="WpCheckinReward">
+        update wp_checkin_reward
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">`name` = #{name},</if>
+            <if test="times != null ">`times` = #{times},</if>
+            <if test="money != null ">`money` = #{money},</if>
+            <if test="sort != null ">`sort` = #{sort},</if>
+            <if test="createtime != null  and createtime != ''">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpCheckinRewardById" parameterType="Integer">
+        delete from wp_checkin_reward where id = #{id}
+    </delete>
+
+    <delete id="deleteWpCheckinRewardByIds" parameterType="String">
+        delete from wp_checkin_reward where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

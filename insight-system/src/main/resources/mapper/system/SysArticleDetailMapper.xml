@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysArticleDetailMapper">
+    
+    <resultMap type="SysArticleDetail" id="SysArticleDetailResult">
+        <result property="id"    column="id"    />
+        <result property="type"    column="type"    />
+        <result property="typename"    column="typename"    />
+        <result property="title"    column="title"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="content"    column="content"    />
+        <result property="picurl"    column="picUrl"    />
+        <result property="status"    column="status"    />
+        <result property="subtitle"    column="subTitle"    />
+        <result property="picthumb"    column="picThumb"    />
+        <result property="keywords"    column="keywords"    />
+        <result property="description"    column="description"    />
+        <result property="readnum"    column="readnum"    />
+    </resultMap>
+
+    <sql id="selectSysArticleDetailVo">
+        SELECT t.id, t.`type`, t.title, t.create_time, t.update_time, t.content, t.picUrl,t.status, 
+        	t.subTitle, t.picThumb,t.keywords,t.description, m.`title` typename,t.`from`,t.`readnum` 
+        FROM sys_article_detail t 
+        LEFT JOIN `sys_article_type` m ON t.`type`=m.`id`
+    </sql>
+
+    <select id="selectSysArticleDetailList" parameterType="SysArticleDetail" resultMap="SysArticleDetailResult">
+        <include refid="selectSysArticleDetailVo"/>
+        <where>  
+            <if test="type != null "> and t.type = #{type}</if>
+            <if test="title != null  and title != ''"> and t.title = #{title}</if>
+            <if test="status != null "> and t.status = #{status}</if>
+            <if test="subtitle != null  and subtitle != ''"> and t.subTitle like concat('%', #{subtitle}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="queryArticleList" parameterType="ArticleParam" resultType="com.wjyoption.system.vo.ArticleDetailVo" >
+        <include refid="selectSysArticleDetailVo"/>
+       	where t.status=0
+        <if test="type != null "> and t.type = #{type}</if>
+        order by t.id desc
+    </select>
+    
+    <select id="queryArticleDetails" parameterType="ArticleParam" resultType="com.wjyoption.system.vo.ArticleDetailVo" >
+        SELECT t.id, t.`type`, t.title, t.create_time, t.update_time, t.content, t.picUrl, t.status
+        		, t.subTitle, t.picThumb, t.keywords, t.description,t.`readnum`
+       	FROM sys_article_detail t WHERE t.id IN (#{id},
+		(SELECT MAX(m.id) FROM sys_article_detail m WHERE m.id &lt; #{id} AND m.type=#{type}),
+		(SELECT MIN(m.id) FROM sys_article_detail m WHERE m.id &gt; #{id} AND m.type=#{type}))
+    </select>
+    
+    <select id="selectSysArticleDetailById" parameterType="Integer" resultMap="SysArticleDetailResult">
+        <include refid="selectSysArticleDetailVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertSysArticleDetail" parameterType="SysArticleDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_article_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null ">type,</if>
+            <if test="title != null  and title != ''">title,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="content != null  and content != ''">content,</if>
+            <if test="picurl != null  and picurl != ''">picUrl,</if>
+            <if test="status != null ">status,</if>
+            <if test="readnum != null ">readnum,</if>
+            <if test="subtitle != null  and subtitle != ''">subTitle,</if>
+            <if test="picthumb != null  and picthumb != ''">picThumb,</if>
+            <if test="from != null  and from != ''">`from`,</if>
+            <if test="keywords != null  and keywords != ''">`keywords`,</if>
+            <if test="description != null  and description != ''">`description`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type != null ">#{type},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="picurl != null  and picurl != ''">#{picurl},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="readnum != null ">#{readnum},</if>
+            <if test="subtitle != null  and subtitle != ''">#{subtitle},</if>
+            <if test="picthumb != null  and picthumb != ''">#{picthumb},</if>
+            <if test="from != null  and from != ''">#{from},</if>
+            <if test="keywords != null  and keywords != ''">#{keywords},</if>
+            <if test="description != null  and description != ''">#{description},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysArticleDetail" parameterType="SysArticleDetail">
+        update sys_article_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="type != null ">type = #{type},</if>
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="content != null  and content != ''">content = #{content},</if>
+            <if test="picurl != null  and picurl != ''">picUrl = #{picurl},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="readnum != null ">readnum = #{readnum},</if>
+            <if test="subtitle != null  and subtitle != ''">subTitle = #{subtitle},</if>
+            <if test="picthumb != null  and picthumb != ''">picThumb = #{picthumb},</if>
+            <if test="from != null  and from != ''">`from` = #{from},</if>
+            <if test="keywords != null  and keywords != ''">`keywords` = #{keywords},</if>
+            <if test="description != null  and description != ''">`description` = #{description},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysArticleDetailById" parameterType="Integer">
+        delete from sys_article_detail where id = #{id}
+    </delete>
+
+    <delete id="deleteSysArticleDetailByIds" parameterType="String">
+        delete from sys_article_detail where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

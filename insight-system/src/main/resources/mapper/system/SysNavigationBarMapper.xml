@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysNavigationBarMapper">
+    
+    <resultMap type="SysNavigationBar" id="SysNavigationBarResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="tourl"    column="tourl"    />
+        <result property="barlevel"    column="barlevel"    />
+        <result property="barorder"    column="barorder"    />
+        <result property="bartype"    column="bartype"    />
+        <result property="target"    column="target"    />
+        <result property="barcode"    column="barcode"    />
+        <result property="barstatus"    column="barstatus"    />
+        <result property="parentid"    column="parentid"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="parentname"    column="parentname"    />
+        <result property="iconurl"    column="iconurl"    />
+    </resultMap>
+
+    <sql id="selectSysNavigationBarVo">
+        select t.*,p.name parentname
+        from sys_navigation_bar t
+        left join sys_navigation_bar p on t.parentid=p.id
+    </sql>
+
+    <select id="selectSysNavigationBarList" parameterType="SysNavigationBar" resultMap="SysNavigationBarResult">
+        <include refid="selectSysNavigationBarVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and t.`name` like concat('%', #{name}, '%')</if>
+            <if test="barlevel != null "> and t.`barlevel` = #{barlevel}</if>
+            <if test="bartype != null "> and t.`bartype` = #{bartype}</if>
+            <if test="barstatus != null "> and t.`barstatus` = #{barstatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysNavigationBarById" parameterType="Long" resultMap="SysNavigationBarResult">
+        <include refid="selectSysNavigationBarVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertSysNavigationBar" parameterType="SysNavigationBar" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_navigation_bar
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">`name`,</if>
+            <if test="tourl != null  and tourl != ''">`tourl`,</if>
+            <if test="barlevel != null ">`barlevel`,</if>
+            <if test="barorder != null ">`barorder`,</if>
+            <if test="bartype != null ">`bartype`,</if>
+            <if test="barstatus != null ">`barstatus`,</if>
+            <if test="target != null  and target != ''">`target`,</if>
+            <if test="barcode != null  and barcode != ''">`barcode`,</if>
+            <if test="iconurl != null  and iconurl != ''">`iconurl`,</if>
+            <if test="parentid != null ">`parentid`,</if>
+            <if test="updateTime != null ">`update_time`,</if>
+            <if test="createTime != null ">`create_time`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="tourl != null  and tourl != ''">#{tourl},</if>
+            <if test="barlevel != null ">#{barlevel},</if>
+            <if test="barorder != null ">#{barorder},</if>
+            <if test="bartype != null ">#{bartype},</if>
+            <if test="barstatus != null ">#{barstatus},</if>
+            <if test="target != null  and target != ''">#{target},</if>
+            <if test="barcode != null  and barcode != ''">#{barcode},</if>
+            <if test="iconurl != null  and iconurl != ''">#{iconurl},</if>
+            <if test="parentid != null ">#{parentid},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="createTime != null ">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysNavigationBar" parameterType="SysNavigationBar">
+        update sys_navigation_bar
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">`name` = #{name},</if>
+            <if test="tourl != null  and tourl != ''">`tourl` = #{tourl},</if>
+            <if test="barlevel != null ">`barlevel` = #{barlevel},</if>
+            <if test="barorder != null ">`barorder` = #{barorder},</if>
+            <if test="bartype != null ">`bartype` = #{bartype},</if>
+            <if test="barstatus != null ">`barstatus` = #{barstatus},</if>
+            <if test="target != null  and target != ''">`target` = #{target},</if>
+            <if test="barcode != null  and barcode != ''">`barcode` = #{barcode},</if>
+            <if test="iconurl != null  and iconurl != ''">`iconurl` = #{iconurl},</if>
+            <if test="parentid != null ">`parentid` = #{parentid},</if>
+            <if test="updateTime != null ">`update_time` = #{updateTime},</if>
+            <if test="createTime != null ">`create_time` = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysNavigationBarById" parameterType="Long">
+        delete from sys_navigation_bar where id = #{id}
+    </delete>
+
+    <delete id="deleteSysNavigationBarByIds" parameterType="String">
+        delete from sys_navigation_bar where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

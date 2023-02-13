@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpTopStatMapper">
+    
+    <resultMap type="WpTopStat" id="WpTopStatResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="registnum"    column="registnum"    />
+        <result property="level1num"    column="level1num"    />
+        <result property="level2num"    column="level2num"    />
+        <result property="level3num"    column="level3num"    />
+        <result property="level1rechargeprice"    column="level1rechargeprice"    />
+        <result property="level2rechargeprice"    column="level2rechargeprice"    />
+        <result property="level3rechargeprice"    column="level3rechargeprice"    />
+        <result property="level1cashprice"    column="level1cashprice"    />
+        <result property="level2cashprice"    column="level2cashprice"    />
+        <result property="level3cashprice"    column="level3cashprice"    />
+        <result property="totalrechargenum"    column="totalrechargenum"    />
+        <result property="totalrechargeprice"    column="totalrechargeprice"    />
+        <result property="cashnum"    column="cashnum"    />
+        <result property="cashprice"    column="cashprice"    />
+        <result property="ibnum"    column="ibnum"    />
+        <result property="daily"    column="daily"    />
+    </resultMap>
+
+    <sql id="selectWpTopStatVo">
+        select t.id, t.uid, t.utel, t.registnum, t.level1num, t.level2num, t.level3num, t.level1rechargeprice, t.level2rechargeprice, t.level3rechargeprice, 
+        t.level1cashprice, t.level2cashprice, t.level3cashprice, t.totalrechargenum, t.totalrechargeprice, t.cashnum, t.cashprice, t.ibnum, t.daily 
+        from wp_top_stat t
+    </sql>
+
+    <select id="selectTotalList" parameterType="WpTopStat" resultMap="WpTopStatResult">
+        select t.id, t.uid, t.utel, t.registnum, t.level1num, t.level2num, t.level3num, t.level1rechargeprice, t.level2rechargeprice, t.level3rechargeprice, 
+        t.level1cashprice, t.level2cashprice, t.level3cashprice, t.totalrechargenum, t.totalrechargeprice, t.cashnum, t.cashprice, tt.ibnum, t.daily 
+        from wp_top_stat t
+        join (select max(g.id) id,sum(g.ibnum) ibnum from wp_top_stat g group by g.uid) tt on t.id=tt.id
+        <where>  
+        	<if test="utel != null  and utel != ''"> and t.`utel` = #{utel}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+			<if test="uids != null">
+				AND t.`uid` in 
+				<foreach item="uid" collection="uids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectWpTopStatList" parameterType="WpTopStat" resultMap="WpTopStatResult">
+        <include refid="selectWpTopStatVo"/>
+        <where>  
+            <if test="utel != null  and utel != ''"> and t.`utel` = #{utel}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="daily != null "> and t.`daily` = #{daily}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND t.`daily` &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND t.`daily` &lt;= #{params.endTime}
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectWpTopStatById" parameterType="Integer" resultMap="WpTopStatResult">
+        <include refid="selectWpTopStatVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpTopStat" parameterType="WpTopStat" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_top_stat
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="utel != null  and utel != ''">`utel`,</if>
+            <if test="registnum != null ">`registnum`,</if>
+            <if test="level1num != null ">`level1num`,</if>
+            <if test="level2num != null ">`level2num`,</if>
+            <if test="level3num != null ">`level3num`,</if>
+            <if test="level1rechargeprice != null ">`level1rechargeprice`,</if>
+            <if test="level2rechargeprice != null ">`level2rechargeprice`,</if>
+            <if test="level3rechargeprice != null ">`level3rechargeprice`,</if>
+            <if test="level1cashprice != null ">`level1cashprice`,</if>
+            <if test="level2cashprice != null ">`level2cashprice`,</if>
+            <if test="level3cashprice != null ">`level3cashprice`,</if>
+            <if test="totalrechargenum != null ">`totalrechargenum`,</if>
+            <if test="totalrechargeprice != null ">`totalrechargeprice`,</if>
+            <if test="cashnum != null ">`cashnum`,</if>
+            <if test="cashprice != null ">`cashprice`,</if>
+            <if test="ibnum != null ">`ibnum`,</if>
+            <if test="daily != null ">`daily`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="utel != null  and utel != ''">#{utel},</if>
+            <if test="registnum != null ">#{registnum},</if>
+            <if test="level1num != null ">#{level1num},</if>
+            <if test="level2num != null ">#{level2num},</if>
+            <if test="level3num != null ">#{level3num},</if>
+            <if test="level1rechargeprice != null ">#{level1rechargeprice},</if>
+            <if test="level2rechargeprice != null ">#{level2rechargeprice},</if>
+            <if test="level3rechargeprice != null ">#{level3rechargeprice},</if>
+            <if test="level1cashprice != null ">#{level1cashprice},</if>
+            <if test="level2cashprice != null ">#{level2cashprice},</if>
+            <if test="level3cashprice != null ">#{level3cashprice},</if>
+            <if test="totalrechargenum != null ">#{totalrechargenum},</if>
+            <if test="totalrechargeprice != null ">#{totalrechargeprice},</if>
+            <if test="cashnum != null ">#{cashnum},</if>
+            <if test="cashprice != null ">#{cashprice},</if>
+            <if test="ibnum != null ">#{ibnum},</if>
+            <if test="daily != null ">#{daily},</if>
+         </trim>
+    </insert>
+    
+    <insert id="batchAdd">
+		INSERT INTO `wp_top_stat` (`uid`,`utel`,`registnum`,`level1num`,`level2num`,`level3num`,`level1rechargeprice`,`level2rechargeprice`,`level3rechargeprice`
+				,`level1cashprice`,`level2cashprice`,`level3cashprice`,`totalrechargenum`,`totalrechargeprice`,`cashnum`,`cashprice`,`ibnum`,`daily`) 
+		<foreach item="item" index="index" collection="list" separator=",">
+			(#{item.uid},#{item.utel},#{item.registnum},#{item.level1num},#{item.level2num},#{item.level3num},#{item.level1rechargeprice},#{item.level2rechargeprice},#{item.level3rechargeprice}
+				,#{item.level1cashprice},#{item.level2cashprice},#{item.level3cashprice},#{item.totalrechargenum},#{item.totalrechargeprice},#{item.cashnum},#{item.cashprice},#{item.ibnum},#{item.daily})
+		</foreach>
+	</insert>
+
+    <update id="updateWpTopStat" parameterType="WpTopStat">
+        update wp_top_stat
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="utel != null  and utel != ''">`utel` = #{utel},</if>
+            <if test="registnum != null ">`registnum` = #{registnum},</if>
+            <if test="level1num != null ">`level1num` = #{level1num},</if>
+            <if test="level2num != null ">`level2num` = #{level2num},</if>
+            <if test="level3num != null ">`level3num` = #{level3num},</if>
+            <if test="level1rechargeprice != null ">`level1rechargeprice` = #{level1rechargeprice},</if>
+            <if test="level2rechargeprice != null ">`level2rechargeprice` = #{level2rechargeprice},</if>
+            <if test="level3rechargeprice != null ">`level3rechargeprice` = #{level3rechargeprice},</if>
+            <if test="level1cashprice != null ">`level1cashprice` = #{level1cashprice},</if>
+            <if test="level2cashprice != null ">`level2cashprice` = #{level2cashprice},</if>
+            <if test="level3cashprice != null ">`level3cashprice` = #{level3cashprice},</if>
+            <if test="totalrechargenum != null ">`totalrechargenum` = #{totalrechargenum},</if>
+            <if test="totalrechargeprice != null ">`totalrechargeprice` = #{totalrechargeprice},</if>
+            <if test="cashnum != null ">`cashnum` = #{cashnum},</if>
+            <if test="cashprice != null ">`cashprice` = #{cashprice},</if>
+            <if test="ibnum != null ">`ibnum` = #{ibnum},</if>
+            <if test="daily != null ">`daily` = #{daily},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpTopStatById" parameterType="Integer">
+        delete from wp_top_stat where id = #{id}
+    </delete>
+
+    <delete id="deleteWpTopStatByIds" parameterType="String">
+        delete from wp_top_stat where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

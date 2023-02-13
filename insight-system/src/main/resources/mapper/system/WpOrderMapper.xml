@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpOrderMapper">
+    
+    <resultMap type="WpOrder" id="WpOrderResult">
+        <result property="oid"    column="oid"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="toputel"    column="toputel"    />
+        <result property="pid"    column="pid"    />
+        <result property="ostyle"    column="ostyle"    />
+        <result property="buytime"    column="buytime"    />
+        <result property="onumber"    column="onumber"    />
+        <result property="selltime"    column="selltime"    />
+        <result property="ostaus"    column="ostaus"    />
+        <result property="buyprice"    column="buyprice"    />
+        <result property="sellprice"    column="sellprice"    />
+        <result property="endprofit"    column="endprofit"    />
+        <result property="endloss"    column="endloss"    />
+        <result property="fee"    column="fee"    />
+        <result property="eid"    column="eid"    />
+        <result property="orderno"    column="orderno"    />
+        <result property="ptitle"    column="ptitle"    />
+        <result property="commission"    column="commission"    />
+        <result property="ploss"    column="ploss"    />
+        <result property="display"    column="display"    />
+        <result property="isshow"    column="isshow"    />
+        <result property="isWin"    column="is_win"    />
+        <result property="kongType"    column="kong_type"    />
+        <result property="sxFee"    column="sx_fee"    />
+        <result property="canKong"    column="can_kong"    />
+    </resultMap>
+
+    <sql id="selectWpOrderVo">
+        select t.oid, t.uid, t.pid, t.ostyle, t.buytime, t.onumber, t.selltime, t.ostaus, t.buyprice, t.sellprice, t.endprofit, t.endloss, t.fee, t.eid, t.orderno, 
+        	t.ptitle, t.commission, t.ploss, t.display, t.isshow, t.is_win, t.kong_type, t.sx_fee, t.can_kong,u.utel,tu.utel toputel 
+        from wp_order t
+        left join wp_userinfo u on t.uid=u.uid
+        left join wp_userinfo tu on tu.uid=u.topid
+    </sql>
+    <sql id="listWhere">
+    	<where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="pid != null "> and t.`pid` = #{pid}</if>
+            <if test="ostyle != null "> and t.`ostyle` = #{ostyle}</if>
+            <if test="buytime != null "> and t.`buytime` = #{buytime}</if>
+            <if test="selltime != null "> and t.`selltime` &lt; #{selltime}</if>
+            <if test="ostaus != null "> and t.`ostaus` = #{ostaus}</if>
+            <if test="buyprice != null "> and t.`buyprice` = #{buyprice}</if>
+            <if test="sellprice != null "> and t.`sellprice` = #{sellprice}</if>
+            <if test="endprofit != null  and endprofit != ''"> and t.`endprofit` = #{endprofit}</if>
+            <if test="utel != null  and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="toputel != null  and toputel != ''"> and tu.`utel` = #{toputel}</if>
+            <if test="fee != null "> and t.`fee` = #{fee}</if>
+            <if test="ptitle != null  and ptitle != ''"> and t.`ptitle` = #{ptitle}</if>
+            <if test="ploss != null "> and t.`ploss` = #{ploss}</if>
+            <if test="isWin != null "> and t.`is_win` = #{isWin}</if>
+            <if test="topid != null "> and tu.`uid` = #{topid}</if>
+            <if test="normaltype != null "> and u.`normaltype` = #{normaltype}</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND from_unixtime(t.`buytime`,'%Y%m%d') &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND from_unixtime(t.`buytime`,'%Y%m%d') &lt;= #{params.endTime}
+			</if>
+        </where>
+    </sql>
+
+    <select id="selectWpOrderList" parameterType="WpOrder" resultMap="WpOrderResult">
+        <include refid="selectWpOrderVo"/>
+        <include refid="listWhere"/>
+    </select>
+    <select id="selectWpOrderListTotal" parameterType="WpOrder" resultType="java.util.Map">
+        select count(1) totalNum,sum(t.ploss) totalPloss,count(distinct t.uid) userNum,sum(t.fee) totalFee 
+        from wp_order t
+        left join wp_userinfo u on t.uid=u.uid
+        left join wp_userinfo tu on tu.uid=u.topid
+        <include refid="listWhere"/>
+    </select>
+    <select id="selectOrderList" parameterType="WpOrder" resultType="OrderResp">
+        select t.oid, t.pid, t.ostyle, t.buytime, t.selltime, t.ostaus, t.buyprice, t.sellprice, t.fee, t.orderno, 
+        	t.ptitle, t.ploss, t.is_win isWin, t.sx_fee sxFee, t.endprofit 
+        from wp_order t
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="pid != null "> and t.`pid` = #{pid}</if>
+            <if test="ostyle != null "> and t.`ostyle` = #{ostyle}</if>
+            <if test="ostaus != null "> and t.`ostaus` = #{ostaus}</if>
+            <if test="ptitle != null  and ptitle != ''"> and t.`ptitle` = #{ptitle}</if>
+            <if test="isWin != null "> and t.`is_win` = #{isWin}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpOrderById" parameterType="Integer" resultMap="WpOrderResult">
+        <include refid="selectWpOrderVo"/>
+        where t.oid = #{oid}
+    </select>
+        
+    <insert id="insertWpOrder" parameterType="WpOrder" useGeneratedKeys="true" keyProperty="oid">
+        insert into wp_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="pid != null ">`pid`,</if>
+            <if test="ostyle != null ">`ostyle`,</if>
+            <if test="buytime != null ">`buytime`,</if>
+            <if test="onumber != null ">`onumber`,</if>
+            <if test="selltime != null ">`selltime`,</if>
+            <if test="ostaus != null ">`ostaus`,</if>
+            <if test="buyprice != null ">`buyprice`,</if>
+            <if test="sellprice != null ">`sellprice`,</if>
+            <if test="endprofit != null  and endprofit != ''">`endprofit`,</if>
+            <if test="endloss != null ">`endloss`,</if>
+            <if test="fee != null ">`fee`,</if>
+            <if test="eid != null ">`eid`,</if>
+            <if test="orderno != null  and orderno != ''">`orderno`,</if>
+            <if test="ptitle != null  and ptitle != ''">`ptitle`,</if>
+            <if test="commission != null ">`commission`,</if>
+            <if test="ploss != null ">`ploss`,</if>
+            <if test="display != null ">`display`,</if>
+            <if test="isshow != null ">`isshow`,</if>
+            <if test="isWin != null ">`is_win`,</if>
+            <if test="kongType != null ">`kong_type`,</if>
+            <if test="sxFee != null ">`sx_fee`,</if>
+            <if test="canKong != null ">`can_kong`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="pid != null ">#{pid},</if>
+            <if test="ostyle != null ">#{ostyle},</if>
+            <if test="buytime != null ">#{buytime},</if>
+            <if test="onumber != null ">#{onumber},</if>
+            <if test="selltime != null ">#{selltime},</if>
+            <if test="ostaus != null ">#{ostaus},</if>
+            <if test="buyprice != null ">#{buyprice},</if>
+            <if test="sellprice != null ">#{sellprice},</if>
+            <if test="endprofit != null  and endprofit != ''">#{endprofit},</if>
+            <if test="endloss != null ">#{endloss},</if>
+            <if test="fee != null ">#{fee},</if>
+            <if test="eid != null ">#{eid},</if>
+            <if test="orderno != null  and orderno != ''">#{orderno},</if>
+            <if test="ptitle != null  and ptitle != ''">#{ptitle},</if>
+            <if test="commission != null ">#{commission},</if>
+            <if test="ploss != null ">#{ploss},</if>
+            <if test="display != null ">#{display},</if>
+            <if test="isshow != null ">#{isshow},</if>
+            <if test="isWin != null ">#{isWin},</if>
+            <if test="kongType != null ">#{kongType},</if>
+            <if test="sxFee != null ">#{sxFee},</if>
+            <if test="canKong != null ">#{canKong},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpOrder" parameterType="WpOrder">
+        update wp_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="pid != null ">`pid` = #{pid},</if>
+            <if test="ostyle != null ">`ostyle` = #{ostyle},</if>
+            <if test="buytime != null ">`buytime` = #{buytime},</if>
+            <if test="onumber != null ">`onumber` = #{onumber},</if>
+            <if test="selltime != null ">`selltime` = #{selltime},</if>
+            <if test="ostaus != null ">`ostaus` = #{ostaus},</if>
+            <if test="buyprice != null ">`buyprice` = #{buyprice},</if>
+            <if test="sellprice != null ">`sellprice` = #{sellprice},</if>
+            <if test="endprofit != null  and endprofit != ''">`endprofit` = #{endprofit},</if>
+            <if test="endloss != null ">`endloss` = #{endloss},</if>
+            <if test="fee != null ">`fee` = #{fee},</if>
+            <if test="eid != null ">`eid` = #{eid},</if>
+            <if test="orderno != null  and orderno != ''">`orderno` = #{orderno},</if>
+            <if test="ptitle != null  and ptitle != ''">`ptitle` = #{ptitle},</if>
+            <if test="commission != null ">`commission` = #{commission},</if>
+            <if test="ploss != null ">`ploss` = #{ploss},</if>
+            <if test="display != null ">`display` = #{display},</if>
+            <if test="isshow != null ">`isshow` = #{isshow},</if>
+            <if test="isWin != null ">`is_win` = #{isWin},</if>
+            <if test="kongType != null ">`kong_type` = #{kongType},</if>
+            <if test="sxFee != null ">`sx_fee` = #{sxFee},</if>
+            <if test="canKong != null ">`can_kong` = #{canKong},</if>
+        </trim>
+        where oid = #{oid}
+    </update>
+
+    <delete id="deleteWpOrderById" parameterType="Integer">
+        delete from wp_order where oid = #{oid}
+    </delete>
+
+    <delete id="deleteWpOrderByIds" parameterType="String">
+        delete from wp_order where oid in 
+        <foreach item="oid" collection="array" open="(" separator="," close=")">
+            #{oid}
+        </foreach>
+    </delete>
+    
+</mapper>

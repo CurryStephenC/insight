@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpCheckinRewardUserMapper">
+    
+    <resultMap type="WpCheckinRewardUser" id="WpCheckinRewardUserResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="refid"    column="refid"    />
+        <result property="money"    column="money"    />
+        <result property="status"    column="status"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpCheckinRewardUserVo">
+        select t.id, t.uid, t.refid, t.money, t.status, t.createtime 
+        from wp_checkin_reward_user t
+        left join wp_userinfo u on t.uid = u.uid 
+    </sql>
+
+    <select id="selectWpCheckinRewardUserList" parameterType="WpCheckinRewardUser" resultMap="WpCheckinRewardUserResult">
+        <include refid="selectWpCheckinRewardUserVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="refid != null "> and t.`refid` = #{refid}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="createtime != null "> and t.`createtime` = #{createtime}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpCheckinRewardUserById" parameterType="Integer" resultMap="WpCheckinRewardUserResult">
+        <include refid="selectWpCheckinRewardUserVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpCheckinRewardUser" parameterType="WpCheckinRewardUser" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_checkin_reward_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="refid != null ">`refid`,</if>
+            <if test="money != null ">`money`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="refid != null ">#{refid},</if>
+            <if test="money != null ">#{money},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="createtime != null ">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpCheckinRewardUser" parameterType="WpCheckinRewardUser">
+        update wp_checkin_reward_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="refid != null ">`refid` = #{refid},</if>
+            <if test="money != null ">`money` = #{money},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpCheckinRewardUserById" parameterType="Integer">
+        delete from wp_checkin_reward_user where id = #{id}
+    </delete>
+
+    <delete id="deleteWpCheckinRewardUserByIds" parameterType="String">
+        delete from wp_checkin_reward_user where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

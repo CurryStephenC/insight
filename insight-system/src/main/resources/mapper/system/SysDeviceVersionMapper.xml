@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysDeviceVersionMapper">
+    
+    <resultMap type="SysDeviceVersion" id="SysDeviceVersionResult">
+        <result property="id"    column="id"    />
+        <result property="deviceid"    column="deviceid"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="version"    column="version"    />
+        <result property="res"    column="res"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysDeviceVersionVo">
+        select t.id, t.deviceid, t.uid, t.version, t.res, t.create_time, t.update_time,u.utel 
+        from sys_device_version t
+        left join wp_userinfo u on t.uid=u.uid
+    </sql>
+
+    <select id="selectSysDeviceVersionList" parameterType="SysDeviceVersion" resultMap="SysDeviceVersionResult">
+        <include refid="selectSysDeviceVersionVo"/>
+        <where>  
+            <if test="deviceid != null  and deviceid != ''"> and t.`deviceid` = #{deviceid}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="utel != null  and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="version != null  and version != ''"> and t.`version` = #{version}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysDeviceVersionById" parameterType="Integer" resultMap="SysDeviceVersionResult">
+        <include refid="selectSysDeviceVersionVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectSysDeviceVersionByDeviceid" parameterType="String" resultMap="SysDeviceVersionResult">
+        <include refid="selectSysDeviceVersionVo"/>
+        where t.deviceid = #{deviceid}
+    </select>
+        
+    <insert id="insertSysDeviceVersion" parameterType="SysDeviceVersion" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_device_version
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceid != null  and deviceid != ''">`deviceid`,</if>
+            <if test="uid != null ">`uid`,</if>
+            <if test="version != null  and version != ''">`version`,</if>
+            <if test="res != null  and res != ''">`res`,</if>
+            <if test="createTime != null ">`create_time`,</if>
+            <if test="updateTime != null ">`update_time`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceid != null  and deviceid != ''">#{deviceid},</if>
+            <if test="uid != null ">#{uid},</if>
+            <if test="version != null  and version != ''">#{version},</if>
+            <if test="res != null  and res != ''">#{res},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysDeviceVersion" parameterType="SysDeviceVersion">
+        update sys_device_version
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceid != null  and deviceid != ''">`deviceid` = #{deviceid},</if>
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="version != null  and version != ''">`version` = #{version},</if>
+            <if test="res != null  and res != ''">`res` = #{res},</if>
+            <if test="createTime != null ">`create_time` = #{createTime},</if>
+            <if test="updateTime != null ">`update_time` = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysDeviceVersionById" parameterType="Integer">
+        delete from sys_device_version where id = #{id}
+    </delete>
+
+    <delete id="deleteSysDeviceVersionByIds" parameterType="String">
+        delete from sys_device_version where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

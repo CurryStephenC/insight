@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysBanksMapper">
+    
+    <resultMap type="SysBanks" id="SysBanksResult">
+        <result property="id"    column="id"    />
+        <result property="bankName"    column="bank_name"    />
+        <result property="bankIcon"    column="bank_icon"    />
+        <result property="isShow"    column="is_show"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysBanksVo">
+        select t.id, t.bank_name, t.bank_icon, t.is_show, t.create_time, t.update_time from sys_banks t
+    </sql>
+
+    <select id="selectSysBanksList" parameterType="SysBanks" resultMap="SysBanksResult">
+        <include refid="selectSysBanksVo"/>
+        <where>  
+            <if test="bankName != null  and bankName != ''"> and `bank_name` like concat('%', #{bankName}, '%')</if>
+            <if test="isShow != null "> and `is_show` = #{isShow}</if>
+        </where>
+    </select>
+    <select id="selectBanksList" resultType="BanksResp">
+        SELECT t.`id`,t.`bank_icon` bankIcon,t.`bank_name` bankName
+		FROM sys_banks t
+		WHERE t.`is_show` = 0
+    </select>
+    
+    <select id="selectBanksById" resultType="BanksResp">
+        SELECT t.`id`,t.`bank_icon` bankIcon,t.`bank_name` bankName
+		FROM sys_banks t
+		where t.id = #{id}
+    </select>
+    
+    <select id="selectSysBanksById" parameterType="Integer" resultMap="SysBanksResult">
+        <include refid="selectSysBanksVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysBanks" parameterType="SysBanks" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_banks
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bankName != null  and bankName != ''">`bank_name`,</if>
+            <if test="bankIcon != null  and bankIcon != ''">`bank_icon`,</if>
+            <if test="isShow != null ">`is_show`,</if>
+            <if test="createTime != null ">`create_time`,</if>
+            <if test="updateTime != null ">`update_time`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bankName != null  and bankName != ''">#{bankName},</if>
+            <if test="bankIcon != null  and bankIcon != ''">#{bankIcon},</if>
+            <if test="isShow != null ">#{isShow},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBanks" parameterType="SysBanks">
+        update sys_banks
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bankName != null  and bankName != ''">`bank_name` = #{bankName},</if>
+            <if test="bankIcon != null  and bankIcon != ''">`bank_icon` = #{bankIcon},</if>
+            <if test="isShow != null ">`is_show` = #{isShow},</if>
+            <if test="createTime != null ">`create_time` = #{createTime},</if>
+            <if test="updateTime != null ">`update_time` = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysBanksById" parameterType="Integer">
+        delete from sys_banks where id = #{id}
+    </delete>
+
+    <delete id="deleteSysBanksByIds" parameterType="String">
+        delete from sys_banks where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

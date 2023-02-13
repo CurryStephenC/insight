@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('支付列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>用户：</p>
+                                <input type="text" name="utel"/>
+                            </li>
+                            <li>
+                                <p>上级：</p>
+                                <input type="text" name="putel"/>
+                            </li>
+                            <li>
+                                <p>销售：</p>
+                                <input type="text" name="toputel"/>
+                            </li>
+                            <li>
+                                <p>流水号：</p>
+                                <input type="text" name="payNo"/>
+                            </li>
+                            <li>
+                                <p>第三方ID：</p>
+                                <input type="text" name="thirdid"/>
+                            </li>
+                            <li>
+                                <p>订单状态：</p>
+                                <select name="status" th:with="type=${@dict.getType('codepay_order_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>支付类型：</p>
+                                <select name="onlinepaytype" >
+                                    <option value="">所有</option>
+                                    <option value="1">在线支付</option>
+                                    <option value="2">数字支付</option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>正常用户：</p>
+                                <select name="normaltype" th:with="type=${@dict.getType('wp_userinfo_normal')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    <option value="">所有</option>
+                                </select>
+                            </li>
+<!--                             <li> -->
+<!--                                 <p>创建时间：</p> -->
+<!--                                 <input type="text" name="creatTime"/> -->
+<!--                             </li> -->
+                            <li class="select-time">
+                                <p>时间：</p>
+                                <input type="text" class="time-input" placeholder="开始时间" name="params[beginTime]" data-format="yyyyMMdd"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" placeholder="结束时间" name="params[endTime]" data-format="yyyyMMdd"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="init()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:payorder:export">
+                    <i class="fa fa-download"></i> 导出
+                 </a>
+                 <p>
+                 	<input type="text" readonly="readonly" disabled="disabled" id="finishTotalMoney">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="todayMoney">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="todayNum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="yesMoney">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="yesNum">
+                 </p>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:payorder:edit')}]];
+        var updateStatusFlag = [[${@permission.hasPermi('system:payorder:updateStatus')}]];
+        var removeFlag = [[${@permission.hasPermi('system:payorder:remove')}]];
+        var auditFlag = [[${@permission.hasPermi('system:payorder:audit')}]];
+        var statusDatas = [[${@dict.getType('codepay_order_status')}]];
+        var prefix = ctx + "system/payorder";
+
+        $(function() {
+        	total();
+        	list();
+        });
+        
+        function init(){
+        	total();
+        	$.table.search()
+        }
+        
+        function reset(){
+        	$.form.reset();
+        	total();
+        }
+        
+        function total(){
+        	var config = {
+       	        url: prefix + "/listTotal",
+       	        type: "post",
+       	        dataType: "json",
+       	        data: $('#formId').serialize(),
+       	        success: function(result) {
+       	        	if(result.data){
+       	        		$("#finishTotalMoney").val("到账金额："+result.data.finishTotalMoney)
+       	        		$("#todayMoney").val("今日金额："+(result.data.todayMoney || "0"))
+       	        		$("#todayNum").val("今日人数："+result.data.todayNum)
+       	        		$("#yesMoney").val("昨日金额："+(result.data.yesMoney || "0"))
+       	        		$("#yesNum").val("昨日人数："+result.data.yesNum)
+       	        	}else{
+       	        		$("#finishTotalMoney").val("到账金额：0")
+       	        		$("#todayMoney").val("今日金额：0")
+       	        		$("#todayNum").val("今日人数：0")
+       	        		$("#yesMoney").val("昨日金额：0")
+       	        		$("#yesNum").val("昨日人数：0")
+       	        	}
+       	        }
+       	    };
+       	    $.ajax(config)
+        }
+        
+        function list(){
+        	var options = {
+                    url: prefix + "/list",
+                    showColumns:true,
+                    showSearch:true,
+                    createUrl: prefix + "/add",
+                    updateUrl: prefix + "/edit/{id}",
+                    removeUrl: prefix + "/remove",
+                    exportUrl: prefix + "/export",
+                    modalName: "支付",
+                    sortName: "id",
+    		        sortOrder: "desc",
+    		        showPageGo: true,
+                    columns: [{
+                        checkbox: true
+                    },
+                    {
+                        field : 'id', 
+                        title : '主键ID',
+                        visible: false
+                    },
+                    {
+                        title: "序号",
+                        formatter: function (value, row, index) {
+                     	    return $.table.serialNumber(index);
+                        }
+                    },
+                    {
+                        field : 'payId', 
+                        title : '用户ID',
+                        visible: false
+                    },
+                    {
+                        field : 'utel', 
+                        title : '用户'
+                    },
+                    {
+                        field : 'putel', 
+                        title : '上级'
+                    },
+                    {
+                        field : 'toputel', 
+                        title : '销售'
+                    },
+                    {
+                        field : 'money', 
+                        title : '实际金额'
+                    },
+                    {
+                        field : 'price', 
+                        title : '原价'
+                    },
+                    {
+                        field : 'payNo', 
+                        title : '流水号'
+                    },
+                    {
+                        field : 'status', 
+                        title : '订单状态',
+                        formatter: function(value, row, index) {
+                           return $.table.selectDictLabel(statusDatas, value);
+                        }
+                    },
+                    {
+                        field : 'creatTime', 
+                        title : '创建时间',
+                        formatter: function(value, row, index) {
+                        	return $.common.formatDate(value);
+                        }
+                    },
+                    {
+                        field : 'upTime', 
+                        title : '完成时间'
+                    },
+                    {
+                        field : 'thirdid', 
+                        title : '第三方ID'
+                    },
+                    {
+                        field : 'comenewtask', 
+                        title : '新手任务',
+                        visible: false,
+                        formatter: function(value, row, index) {
+                        	return value == 0 ? "不是" : "是";
+                        }
+                    },
+                    {
+                        field : 'onlinepaytype', 
+                        title : '支付类型',
+//                         visible: false,
+                        formatter: function(value, row, index) {
+                        	if(value){
+    			    			return value==1 ? "在线支付" : (value==2?"数字支付":(value==3?"PayPal":"其他"));
+                        	}else{
+                        		return "";
+                        	}
+    				    }
+                    },
+                    {
+                        field : 'url', 
+                        title : '支付图',
+                        formatter: function(value, row, index) {
+                        	if(value && row.onlinepaytype > 1){
+    			    			return $.table.imageView(value,null,600);
+                        	}else{
+                        		return "";
+                        	}
+    				    }
+                    },
+                    {
+                        field : 'param', 
+                        title : '支付账号',
+                        visible: false
+                    },
+//                     {
+//                         field : 'operatorid', 
+//                         title : '操作人ID'
+//                     },
+                    {
+                        title: '操作',
+                        align: 'center',
+                        formatter: function(value, row, index) {
+                            var actions = [];
+                            if(row.onlinepaytype > 1 && row.status == 0){
+    	                        actions.push('<a class="btn btn-success btn-xs ' + auditFlag + '" href="javascript:void(0)" onclick="audit(' + row.id + ','+row.money+','+row.price+')"><i class="fa fa-edit"></i>处理</a> ');
+                            }
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                            actions.push('<a class="btn btn-success btn-xs ' + updateStatusFlag + '" href="javascript:void(0)" onclick="updateStatus(\'' + row.id + '\')"><i class="fa fa-edit"></i>修改状态</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                            return actions.join('');
+                        }
+                    }]
+                };
+                $.table.init(options);
+        }
+        var _auditFlag = false;
+        function audit(id,money,price){
+        	if(_auditFlag){
+        		$.modal.alertError("重复点击");
+        		return;
+        	}
+        	var _html = `<input id="price"  type="txt" placeholder="数字货币金额" value="${price}" /><br/>
+        				<input id="money"  type="txt" placeholder="上分金额" value="${money}" />`;
+        	_html += `<br/><br/>
+					<input id="paypsd"  type="txt" placeholder="请输入密码" />`;
+					
+        	layer.confirm(_html, {
+    	        icon: 3,
+    	        title: "审核",
+    	        btn: ['提交', '驳回']
+    	    }, function (index) {
+    	    	var price = $("#price").val();
+    	    	var money = $("#money").val();
+    	    	var paypsd = $("#paypsd").val();
+    			if(!price || !paypsd || !money){
+    				$.modal.alertError("不能为空");
+    				return;
+    			}
+    	    	var param = {
+    					"id" : id,
+    					"password" : paypsd,
+    					"money" : money,
+    					"status" : 1,
+    					"price" : price
+    			}
+    	    	_auditFlag = true;
+    			$.post(prefix + "/auditChongzhi", param, function(result) {
+    				_auditFlag = false;
+    				if (result.code == 0) {
+    					$.modal.msgSuccess("Success");
+    					$.table.refresh();
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+    	    }, function (index) {
+    	    	var price = $("#price").val();
+    	    	var money = $("#money").val();
+    	    	var paypsd = $("#paypsd").val();
+    			if(!paypsd){
+    				$.modal.alertError("密码错误");
+    				return;
+    			}
+    	    	var param = {
+    					"id" : id,
+    					"password" : paypsd,
+    					"money" : money,
+    					"status" : 2,
+    					"price" : price
+    			}
+    	    	_auditFlag = true;
+    			$.post(prefix + "/auditChongzhi", param, function(result) {
+    				_auditFlag = false;
+    				if (result.code == 0) {
+    					$.modal.msgSuccess("Success");
+    					$.table.refresh();
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+    	    });
+        	
+					
+        }
+        
+        function updateStatus(id){
+        	var _html = `<select id="status" >
+        				<option value="1">成功</option>
+        				<option value="2">失败</option>
+        				</select>`;
+        	_html += `<br/><br/>
+					<input id="paypsd"  type="txt" placeholder="请输入密码" />`;
+					
+        	layer.confirm(_html, {
+    	        icon: 3,
+    	        title: "修改状态",
+    	        btn: ['提交', '取消']
+    	    }, function (index) {
+    	    	var status = $("#status").val();
+    	    	var paypsd = $("#paypsd").val();
+    			if(!paypsd){
+    				$.modal.alertError("不能为空");
+    				return;
+    			}
+    	    	var param = {
+    					"id" : id,
+    					"paypsd" : paypsd,
+    					"status" : status
+    			}
+    			$.post(prefix + "/updateStatus", param, function(result) {
+    				if (result.code == 0) {
+    					$.modal.msgSuccess("Success");
+    					$.table.refresh();
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+    	    }, function (index) {
+   				$.modal.closeLoading();
+    	    });
+        }
+    </script>
+</body>
+</html>

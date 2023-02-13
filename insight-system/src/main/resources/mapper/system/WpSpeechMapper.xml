@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpSpeechMapper">
+    
+    <resultMap type="WpSpeech" id="WpSpeechResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="status"    column="status"    />
+        <result property="auditmsg"    column="auditmsg"    />
+        <result property="phone"    column="phone"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="content"    column="content"    />
+        <result property="commentnum"    column="commentnum"    />
+        <result property="likenum"    column="likenum"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="daily"    column="daily"    />
+    </resultMap>
+    
+    <resultMap type="SpeechResp" id="SpeechResult">
+        <result property="id"    column="id"    />
+        <result property="status"    column="status"    />
+        <result property="auditmsg"    column="auditmsg"    />
+        <result property="phone"    column="phone"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="content"    column="content"    />
+        <result property="commentnum"    column="commentnum"    />
+        <result property="likenum"    column="likenum"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="daily"    column="daily"    />
+    </resultMap>
+
+    <sql id="selectWpSpeechVo">
+        select t.id, t.uid, t.status, t.auditmsg, t.phone, t.picurl, t.content, t.commentnum, t.likenum, t.createtime, t.daily,u.utel 
+        from wp_speech t
+        left join wp_userinfo u on t.uid = u.uid
+    </sql>
+
+    <select id="selectWpSpeechList" parameterType="WpSpeech" resultMap="WpSpeechResult">
+        <include refid="selectWpSpeechVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="utel != null and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="daily != null "> and t.`daily` = #{daily}</if>
+        </where>
+    </select>
+    <select id="selectSpeechResp" parameterType="WpSpeech" resultMap="SpeechResult">
+        select t.id, t.status, t.auditmsg, t.phone, t.picurl, t.content, t.commentnum, t.likenum, t.createtime, t.daily
+        from wp_speech t
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpSpeechById" parameterType="Integer" resultMap="WpSpeechResult">
+        <include refid="selectWpSpeechVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpSpeech" parameterType="WpSpeech" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_speech
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="auditmsg != null  and auditmsg != ''">`auditmsg`,</if>
+            <if test="phone != null  and phone != ''">`phone`,</if>
+            <if test="picurl != null  and picurl != ''">`picurl`,</if>
+            <if test="content != null  and content != ''">`content`,</if>
+            <if test="commentnum != null ">`commentnum`,</if>
+            <if test="likenum != null ">`likenum`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+            <if test="daily != null ">`daily`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="auditmsg != null  and auditmsg != ''">#{auditmsg},</if>
+            <if test="phone != null  and phone != ''">#{phone},</if>
+            <if test="picurl != null  and picurl != ''">#{picurl},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="commentnum != null ">#{commentnum},</if>
+            <if test="likenum != null ">#{likenum},</if>
+            <if test="createtime != null ">#{createtime},</if>
+            <if test="daily != null ">#{daily},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpSpeech" parameterType="WpSpeech">
+        update wp_speech
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="auditmsg != null  and auditmsg != ''">`auditmsg` = #{auditmsg},</if>
+            <if test="phone != null  and phone != ''">`phone` = #{phone},</if>
+            <if test="picurl != null  and picurl != ''">`picurl` = #{picurl},</if>
+            <if test="content != null  and content != ''">`content` = #{content},</if>
+            <if test="commentnum != null ">`commentnum` = #{commentnum},</if>
+            <if test="likenum != null ">`likenum` = #{likenum},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+            <if test="daily != null ">`daily` = #{daily},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="increaseOrDecrease" parameterType="WpSpeech">
+        update wp_speech
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="commentnum != null ">`commentnum` = `commentnum` + #{commentnum},</if>
+            <if test="likenum != null ">`likenum` = `likenum` + #{likenum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpSpeechById" parameterType="Integer">
+        delete from wp_speech where id = #{id}
+    </delete>
+
+    <delete id="deleteWpSpeechByIds" parameterType="String">
+        delete from wp_speech where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

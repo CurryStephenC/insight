@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('生成理财记录')" />
+    <th:block th:include="include :: layout-latest-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-financialrecord-add">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">理财产品：</label>
+                <div class="col-sm-8">
+                    <select name="typeid" class="form-control m-b" required>
+                        <option th:each="dict : ${typelist}" th:text="${dict.name}" th:value="${dict.id}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户：</label>
+                <div class="col-sm-8">
+                    <input name="utel" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">购买金额：</label>
+                <div class="col-sm-8">
+                    <input name="buymoney" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">利润：</label>
+                <div class="col-sm-8">
+                    <input name="profit" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">结束时间：</label>
+                <div class="col-sm-8">
+                	<input type="text" class="time-input" placeholder="结束时间" name="params[endtime]" data-format="yyyyMMdd" required/>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">购买次数：</label>
+                <div class="col-sm-8">
+                    <input name="params[time]" class="form-control" type="text" placeholder="如生成三条记录则输入3" required>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: layout-latest-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/financialrecord"
+        $("#form-financialrecord-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/createdata", $('#form-financialrecord-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpUserNovicetaskMapper">
+    
+    <resultMap type="WpUserNovicetask" id="WpUserNovicetaskResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="status"    column="status"    />
+        <result property="reward"    column="reward"    />
+        <result property="orderby"    column="orderby"    />
+        <result property="tasktype"    column="tasktype"    />
+        <result property="audit"    column="audit"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpUserNovicetaskVo">
+        select t.id, t.title, t.status, t.reward, t.orderby, t.tasktype, t.audit, t.createtime from wp_user_novicetask t
+    </sql>
+
+    <select id="selectWpUserNovicetaskList" parameterType="WpUserNovicetask" resultMap="WpUserNovicetaskResult">
+        <include refid="selectWpUserNovicetaskVo"/>
+        <where>  
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="tasktype != null "> and t.`tasktype` = #{tasktype}</if>
+            <if test="audit != null "> and t.`audit` = #{audit}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpUserNovicetaskById" parameterType="Integer" resultMap="WpUserNovicetaskResult">
+        <include refid="selectWpUserNovicetaskVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpUserNovicetask" parameterType="WpUserNovicetask" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_user_novicetask
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null  and title != ''">`title`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="reward != null ">`reward`,</if>
+            <if test="orderby != null ">`orderby`,</if>
+            <if test="tasktype != null ">`tasktype`,</if>
+            <if test="audit != null ">`audit`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="reward != null ">#{reward},</if>
+            <if test="orderby != null ">#{orderby},</if>
+            <if test="tasktype != null ">#{tasktype},</if>
+            <if test="audit != null ">#{audit},</if>
+            <if test="createtime != null ">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpUserNovicetask" parameterType="WpUserNovicetask">
+        update wp_user_novicetask
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null  and title != ''">`title` = #{title},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="reward != null ">`reward` = #{reward},</if>
+            <if test="orderby != null ">`orderby` = #{orderby},</if>
+            <if test="tasktype != null ">`tasktype` = #{tasktype},</if>
+            <if test="audit != null ">`audit` = #{audit},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpUserNovicetaskById" parameterType="Long">
+        delete from wp_user_novicetask where id = #{id}
+    </delete>
+
+    <delete id="deleteWpUserNovicetaskByIds" parameterType="String">
+        delete from wp_user_novicetask where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

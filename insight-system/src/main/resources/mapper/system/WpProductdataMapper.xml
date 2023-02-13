@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpProductdataMapper">
+    
+    <resultMap type="WpProductdata" id="WpProductdataResult">
+        <result property="id"    column="id"    />
+        <result property="pid"    column="pid"    />
+        <result property="name"    column="Name"    />
+        <result property="price"    column="Price"    />
+        <result property="open"    column="Open"    />
+        <result property="close"    column="Close"    />
+        <result property="high"    column="High"    />
+        <result property="low"    column="Low"    />
+        <result property="diff"    column="Diff"    />
+        <result property="diffrate"    column="DiffRate"    />
+        <result property="updatetime"    column="UpdateTime"    />
+        <result property="rands"    column="rands"    />
+        <result property="point"    column="point"    />
+        <result property="isdelete"    column="isdelete"    />
+    </resultMap>
+
+    <sql id="selectWpProductdataVo">
+        select t.id, t.pid, t.Name, t.Price, t.Open, t.Close, t.High, t.Low, t.Diff, t.DiffRate, t.UpdateTime, t.rands, t.point, t.isdelete from wp_productdata t
+    </sql>
+
+    <select id="selectWpProductdataList" parameterType="WpProductdata" resultMap="WpProductdataResult">
+        <include refid="selectWpProductdataVo"/>
+        <where>  
+            <if test="pid != null "> and t.`pid` = #{pid}</if>
+            <if test="name != null  and name != ''"> and t.`Name` = #{name}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpProductdataById" parameterType="Integer" resultMap="WpProductdataResult">
+        <include refid="selectWpProductdataVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectWpProductdataByPid" parameterType="Integer" resultMap="WpProductdataResult">
+        <include refid="selectWpProductdataVo"/>
+        where t.pid = #{pid}
+        limit 1
+    </select>
+        
+    <insert id="insertWpProductdata" parameterType="WpProductdata" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_productdata
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pid != null ">`pid`,</if>
+            <if test="name != null  and name != ''">`Name`,</if>
+            <if test="price != null ">`Price`,</if>
+            <if test="open != null ">`Open`,</if>
+            <if test="close != null ">`Close`,</if>
+            <if test="high != null  and high != ''">`High`,</if>
+            <if test="low != null  and low != ''">`Low`,</if>
+            <if test="diff != null  and diff != ''">`Diff`,</if>
+            <if test="diffrate != null  and diffrate != ''">`DiffRate`,</if>
+            <if test="updatetime != null ">`UpdateTime`,</if>
+            <if test="rands != null  and rands != ''">`rands`,</if>
+            <if test="point != null  and point != ''">`point`,</if>
+            <if test="isdelete != null ">`isdelete`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pid != null ">#{pid},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="price != null ">#{price},</if>
+            <if test="open != null ">#{open},</if>
+            <if test="close != null ">#{close},</if>
+            <if test="high != null  and high != ''">#{high},</if>
+            <if test="low != null  and low != ''">#{low},</if>
+            <if test="diff != null  and diff != ''">#{diff},</if>
+            <if test="diffrate != null  and diffrate != ''">#{diffrate},</if>
+            <if test="updatetime != null ">#{updatetime},</if>
+            <if test="rands != null  and rands != ''">#{rands},</if>
+            <if test="point != null  and point != ''">#{point},</if>
+            <if test="isdelete != null ">#{isdelete},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpProductdata" parameterType="WpProductdata">
+        update wp_productdata
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pid != null ">`pid` = #{pid},</if>
+            <if test="name != null  and name != ''">`Name` = #{name},</if>
+            <if test="price != null ">`Price` = #{price},</if>
+            <if test="open != null ">`Open` = #{open},</if>
+            <if test="close != null ">`Close` = #{close},</if>
+            <if test="high != null  and high != ''">`High` = #{high},</if>
+            <if test="low != null  and low != ''">`Low` = #{low},</if>
+            <if test="diff != null  and diff != ''">`Diff` = #{diff},</if>
+            <if test="diffrate != null  and diffrate != ''">`DiffRate` = #{diffrate},</if>
+            <if test="updatetime != null ">`UpdateTime` = #{updatetime},</if>
+            <if test="rands != null  and rands != ''">`rands` = #{rands},</if>
+            <if test="point != null  and point != ''">`point` = #{point},</if>
+            <if test="isdelete != null ">`isdelete` = #{isdelete},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateWpProductdataByPid" parameterType="WpProductdata">
+        update wp_productdata
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">`Name` = #{name},</if>
+            <if test="price != null ">`Price` = #{price},</if>
+            <if test="open != null ">`Open` = #{open},</if>
+            <if test="close != null ">`Close` = #{close},</if>
+            <if test="high != null  and high != ''">`High` = #{high},</if>
+            <if test="low != null  and low != ''">`Low` = #{low},</if>
+            <if test="diff != null  and diff != ''">`Diff` = #{diff},</if>
+            <if test="diffrate != null  and diffrate != ''">`DiffRate` = #{diffrate},</if>
+            <if test="updatetime != null ">`UpdateTime` = #{updatetime},</if>
+        </trim>
+        where pid = #{pid}
+    </update>
+
+    <delete id="deleteWpProductdataById" parameterType="Integer">
+        delete from wp_productdata where id = #{id}
+    </delete>
+
+    <delete id="deleteWpProductdataByIds" parameterType="String">
+        delete from wp_productdata where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

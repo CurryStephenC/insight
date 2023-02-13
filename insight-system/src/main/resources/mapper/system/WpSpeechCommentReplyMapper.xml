@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpSpeechCommentReplyMapper">
+    
+    <resultMap type="WpSpeechCommentReply" id="WpSpeechCommentReplyResult">
+        <result property="id"    column="id"    />
+        <result property="sid"    column="sid"    />
+        <result property="cid"    column="cid"    />
+        <result property="ccontent"    column="ccontent"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="status"    column="status"    />
+        <result property="auditmsg"    column="auditmsg"    />
+        <result property="phone"    column="phone"    />
+        <result property="toreplyid"    column="toreplyid"    />
+        <result property="touid"    column="touid"    />
+        <result property="replyphone"    column="replyphone"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="content"    column="content"    />
+        <result property="commentnum"    column="commentnum"    />
+        <result property="likenum"    column="likenum"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+    <resultMap type="SpeechReplyResp" id="SpeechCommentReplyResult">
+        <result property="id"    column="id"    />
+        <result property="cid"    column="cid"    />
+        <result property="ccontent"    column="ccontent"    />
+        <result property="cpicurl"    column="cpicurl"    />
+        <result property="cphone"    column="cphone"    />
+        <result property="ccreatetime"    column="ccreatetime"    />
+        <result property="status"    column="status"    />
+        <result property="auditmsg"    column="auditmsg"    />
+        <result property="phone"    column="phone"    />
+        <result property="toreplyid"    column="toreplyid"    />
+        <result property="replycontent"    column="replycontent"    />
+        <result property="touid"    column="touid"    />
+        <result property="replyphone"    column="replyphone"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="content"    column="content"    />
+        <result property="commentnum"    column="commentnum"    />
+        <result property="likenum"    column="likenum"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpSpeechCommentReplyVo">
+        select t.id, t.sid, t.cid, t.uid, t.status, t.auditmsg, t.phone, t.toreplyid, t.touid, t.replyphone, t.picurl, 
+        	t.content, t.commentnum, t.likenum, t.createtime,u.utel,u2.utel toutel,c.content ccontent 
+        from wp_speech_comment_reply t
+        left join wp_speech_comment c on t.cid = c.id
+        left join wp_userinfo u on u.uid = t.uid
+        left join wp_userinfo u2 on u2.uid=t.touid
+    </sql>
+
+    <select id="selectWpSpeechCommentReplyList" parameterType="WpSpeechCommentReply" resultMap="WpSpeechCommentReplyResult">
+        <include refid="selectWpSpeechCommentReplyVo"/>
+        <where>  
+            <if test="cid != null "> and t.`cid` = #{cid}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="utel != null and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="commentnum != null "> and t.`commentnum` = #{commentnum}</if>
+            <if test="likenum != null "> and t.`likenum` = #{likenum}</if>
+            <if test="createtime != null "> and t.`createtime` = #{createtime}</if>
+        </where>
+    </select>
+    <select id="selectSpeechReplyResp" parameterType="WpSpeechCommentReply" resultMap="SpeechCommentReplyResult">
+        select t.id, t.status, t.auditmsg, t.phone, t.toreplyid, t.touid, t.replyphone, t.picurl,t.content, t.commentnum, t.likenum, 
+        t.createtime,t.cid,c.content ccontent,c.picurl cpicurl,c.phone cphone,c.createtime ccreatetime,reply.content replycontent
+        from wp_speech_comment_reply t
+        left join wp_speech_comment c on t.cid = c.id
+        left join wp_speech_comment_reply reply on reply.id=t.toreplyid
+        <where>  
+            <if test="cid != null "> and t.`cid` = #{cid}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpSpeechCommentReplyById" parameterType="Integer" resultMap="WpSpeechCommentReplyResult">
+        <include refid="selectWpSpeechCommentReplyVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpSpeechCommentReply" parameterType="WpSpeechCommentReply" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_speech_comment_reply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sid != null ">`sid`,</if>
+            <if test="cid != null ">`cid`,</if>
+            <if test="uid != null ">`uid`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="auditmsg != null  and auditmsg != ''">`auditmsg`,</if>
+            <if test="phone != null  and phone != ''">`phone`,</if>
+            <if test="toreplyid != null ">`toreplyid`,</if>
+            <if test="touid != null ">`touid`,</if>
+            <if test="replyphone != null  and replyphone != ''">`replyphone`,</if>
+            <if test="picurl != null  and picurl != ''">`picurl`,</if>
+            <if test="content != null  and content != ''">`content`,</if>
+            <if test="commentnum != null ">`commentnum`,</if>
+            <if test="likenum != null ">`likenum`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sid != null ">#{sid},</if>
+            <if test="cid != null ">#{cid},</if>
+            <if test="uid != null ">#{uid},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="auditmsg != null  and auditmsg != ''">#{auditmsg},</if>
+            <if test="phone != null  and phone != ''">#{phone},</if>
+            <if test="toreplyid != null ">#{toreplyid},</if>
+            <if test="touid != null ">#{touid},</if>
+            <if test="replyphone != null  and replyphone != ''">#{replyphone},</if>
+            <if test="picurl != null  and picurl != ''">#{picurl},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="commentnum != null ">#{commentnum},</if>
+            <if test="likenum != null ">#{likenum},</if>
+            <if test="createtime != null ">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpSpeechCommentReply" parameterType="WpSpeechCommentReply">
+        update wp_speech_comment_reply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sid != null ">`sid` = #{sid},</if>
+            <if test="cid != null ">`cid` = #{cid},</if>
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="auditmsg != null  and auditmsg != ''">`auditmsg` = #{auditmsg},</if>
+            <if test="phone != null  and phone != ''">`phone` = #{phone},</if>
+            <if test="toreplyid != null ">`toreplyid` = #{toreplyid},</if>
+            <if test="touid != null ">`touid` = #{touid},</if>
+            <if test="replyphone != null  and replyphone != ''">`replyphone` = #{replyphone},</if>
+            <if test="picurl != null  and picurl != ''">`picurl` = #{picurl},</if>
+            <if test="content != null  and content != ''">`content` = #{content},</if>
+            <if test="commentnum != null ">`commentnum` = #{commentnum},</if>
+            <if test="likenum != null ">`likenum` = #{likenum},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    
+    <update id="increaseOrDecrease" parameterType="WpSpeechCommentReply">
+        update wp_speech_comment_reply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="commentnum != null ">`commentnum` = `commentnum` + #{commentnum},</if>
+            <if test="likenum != null ">`likenum` = `likenum` + #{likenum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpSpeechCommentReplyById" parameterType="Integer">
+        delete from wp_speech_comment_reply where id = #{id}
+    </delete>
+
+    <delete id="deleteWpSpeechCommentReplyByIds" parameterType="String">
+        delete from wp_speech_comment_reply where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

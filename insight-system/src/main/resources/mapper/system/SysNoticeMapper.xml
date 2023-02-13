@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysNoticeMapper">
+    
+    <resultMap type="SysNotice" id="SysNoticeResult">
+        <result property="noticeId"       column="notice_id"       />
+        <result property="noticeTitle"    column="notice_title"    />
+        <result property="noticeType"     column="notice_type"     />
+        <result property="noticeContent"  column="notice_content"  />
+        <result property="status"         column="status"          />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"          />
+        <result property="begintime"      column="begintime"          />
+        <result property="endtime"        column="endtime"          />
+        <result property="picurl"         column="picurl"          />
+        <result property="tourl"         column="tourl"          />
+    </resultMap>
+    
+    <sql id="selectNoticeVo">
+        select notice_id, notice_title, notice_type, notice_content, status, create_by, create_time, update_by, update_time, remark 
+        	,begintime,endtime,picurl,tourl
+		from sys_notice
+    </sql>
+    
+    <select id="selectNoticeById" parameterType="Long" resultMap="SysNoticeResult">
+        <include refid="selectNoticeVo"/>
+        where notice_id = #{noticeId}
+    </select>
+    
+    <select id="selectNoticeList" parameterType="SysNotice" resultMap="SysNoticeResult">
+        <include refid="selectNoticeVo"/>
+        <where>
+			<if test="noticeTitle != null and noticeTitle != ''">
+				AND notice_title like concat('%', #{noticeTitle}, '%')
+			</if>
+			<if test="noticeType != null and noticeType != ''">
+				AND notice_type = #{noticeType}
+			</if>
+			<if test="createBy != null and createBy != ''">
+				AND create_by like concat('%', #{createBy}, '%')
+			</if>
+		</where>
+    </select>
+    
+    <select id="selectList" parameterType="SysNotice" resultType="NoticeResp">
+        select notice_title noticeTitle, notice_type noticeType, notice_content noticeContent, status, begintime,endtime,picurl,tourl,notice_id noticeId
+		from sys_notice
+        <where>
+			<if test="status != null and status != ''">
+				AND status = #{status}
+			</if>
+			<if test="noticeType != null and noticeType != ''">
+				AND notice_type = #{noticeType}
+			</if>
+			AND date_format(begintime,'%y%m%d') &lt;= date_format(now(),'%y%m%d') 
+			AND date_format(endtime,'%y%m%d') &gt;= date_format(now(),'%y%m%d') 
+		</where>
+    </select>
+    
+    <insert id="insertNotice" parameterType="SysNotice">
+        insert into sys_notice (
+			<if test="noticeTitle != null and noticeTitle != '' ">notice_title, </if>
+			<if test="noticeType != null and noticeType != '' ">notice_type, </if>
+			<if test="noticeContent != null and noticeContent != '' ">notice_content, </if>
+			<if test="status != null and status != '' ">status, </if>
+			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			<if test="begintime != null and begintime != ''">begintime,</if>
+ 			<if test="endtime != null and endtime != ''">endtime,</if>
+ 			<if test="picurl != null and picurl != ''">picurl,</if>
+ 			<if test="tourl != null and tourl != ''">tourl,</if>
+ 			create_time
+ 		)values(
+			<if test="noticeTitle != null and noticeTitle != ''">#{noticeTitle}, </if>
+			<if test="noticeType != null and noticeType != ''">#{noticeType}, </if>
+			<if test="noticeContent != null and noticeContent != ''">#{noticeContent}, </if>
+			<if test="status != null and status != ''">#{status}, </if>
+			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			<if test="begintime != null and begintime != ''">#{begintime},</if>
+ 			<if test="endtime != null and endtime != ''">#{endtime},</if>
+ 			<if test="picurl != null and picurl != ''">#{picurl},</if>
+ 			<if test="tourl != null and tourl != ''">#{tourl},</if>
+ 			sysdate()
+		)
+    </insert>
+	 
+    <update id="updateNotice" parameterType="SysNotice">
+        update sys_notice 
+        <set>
+            <if test="noticeTitle != null and noticeTitle != ''">notice_title = #{noticeTitle}, </if>
+            <if test="noticeType != null and noticeType != ''">notice_type = #{noticeType}, </if>
+            <if test="noticeContent != null">notice_content = #{noticeContent}, </if>
+            <if test="status != null and status != ''">status = #{status}, </if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="begintime != null and begintime != ''">begintime = #{begintime},</if>
+            <if test="endtime != null and endtime != ''">endtime = #{endtime},</if>
+            <if test="picurl != null and picurl != ''">picurl = #{picurl},</if>
+            <if test="tourl != null">tourl = #{tourl},</if>
+ 			update_time = sysdate()
+        </set>
+        where notice_id = #{noticeId}
+    </update>
+	
+    <delete id="deleteNoticeByIds" parameterType="String">
+        delete from sys_notice where notice_id in 
+        <foreach item="noticeId" collection="array" open="(" separator="," close=")">
+            #{noticeId}
+        </foreach>
+    </delete>
+    
+</mapper>

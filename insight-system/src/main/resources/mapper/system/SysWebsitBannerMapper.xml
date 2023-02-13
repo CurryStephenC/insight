@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysWebsitBannerMapper">
+    
+    <resultMap type="SysWebsitBanner" id="SysWebsitBannerResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="name2"    column="name2"    />
+        <result property="code"    column="code"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="videourl"    column="videourl"    />
+        <result property="videourl2"    column="videourl2"    />
+        <result property="bannertype"    column="bannertype"    />
+        <result property="website"    column="website"    />
+        <result property="remark"    column="remark"    />
+        <result property="bannerstatus"    column="bannerstatus"    />
+        <result property="bannerorder"    column="bannerorder"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysWebsitBannerVo">
+        select id, name,name2, code, picurl,videourl,videourl2,bannertype, website,remark,bannerstatus,bannerorder, create_time, update_time from sys_websit_banner
+    </sql>
+
+    <select id="selectSysWebsitBannerList" parameterType="SysWebsitBanner" resultMap="SysWebsitBannerResult">
+        <include refid="selectSysWebsitBannerVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="name2 != null  and name2 != ''"> and name2 like concat('%', #{name2}, '%')</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="bannerstatus != null "> and bannerstatus = #{bannerstatus}</if>
+            <if test="bannertype != null  and bannertype != ''"> and bannertype = #{bannertype}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysWebsitBannerById" parameterType="Integer" resultMap="SysWebsitBannerResult">
+        <include refid="selectSysWebsitBannerVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysWebsitBanner" parameterType="SysWebsitBanner" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_websit_banner
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">name,</if>
+            <if test="name2 != null  and name2 != ''">name2,</if>
+            <if test="code != null  and code != ''">code,</if>
+            <if test="picurl != null  and picurl != ''">picurl,</if>
+            <if test="videourl != null  and videourl != ''">videourl,</if>
+            <if test="videourl2 != null  and videourl2 != ''">videourl2,</if>
+            <if test="bannertype != null  and bannertype != ''">bannertype,</if>
+            <if test="website != null  and website != ''">website,</if>
+            <if test="remark != null  and remark != ''">remark,</if>
+            <if test="bannerstatus != null ">bannerstatus,</if>
+            <if test="bannerorder != null ">bannerorder,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateTime != null ">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="name2 != null  and name2 != ''">#{name2},</if>
+            <if test="code != null  and code != ''">#{code},</if>
+            <if test="picurl != null  and picurl != ''">#{picurl},</if>
+            <if test="videourl != null  and videourl != ''">#{videourl},</if>
+            <if test="videourl2 != null  and videourl2 != ''">#{videourl2},</if>
+            <if test="bannertype != null  and bannertype != ''">#{bannertype},</if>
+            <if test="website != null  and website != ''">#{website},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="bannerstatus != null ">#{bannerstatus},</if>
+            <if test="bannerorder != null ">#{bannerorder},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysWebsitBanner" parameterType="SysWebsitBanner">
+        update sys_websit_banner
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null  and name != ''">name = #{name},</if>
+            <if test="name2 != null  and name2 != ''">name2 = #{name2},</if>
+            <if test="code != null  and code != ''">code = #{code},</if>
+            <if test="picurl != null  and picurl != ''">picurl = #{picurl},</if>
+            <if test="videourl != null  and videourl != ''">videourl = #{videourl},</if>
+            <if test="videourl2 != null  and videourl2 != ''">videourl2 = #{videourl2},</if>
+            <if test="bannertype != null  and bannertype != ''">bannertype = #{bannertype},</if>
+            <if test="website != null  and website != ''">website = #{website},</if>
+            <if test="remark != null  and remark != ''">remark = #{remark},</if>
+            <if test="bannerstatus != null ">bannerstatus = #{bannerstatus},</if>
+            <if test="bannerorder != null ">bannerorder = #{bannerorder},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysWebsitBannerById" parameterType="Integer">
+        delete from sys_websit_banner where id = #{id}
+    </delete>
+
+    <delete id="deleteSysWebsitBannerByIds" parameterType="String">
+        delete from sys_websit_banner where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

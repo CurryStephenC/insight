@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('统计记录列表')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li class="select-time">
+                                <p>统计日期：</p>
+                                <input type="text" class="time-input" placeholder="开始时间" name="params[beginTime]" data-format="yyyyMMdd"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" placeholder="结束时间" name="params[endTime]" data-format="yyyyMMdd"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="init()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:statrecord:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:statrecord:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:statrecord:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a> -->
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:statrecord:export">
+                    <i class="fa fa-download"></i> 导出
+                 </a>
+                 <p>
+                 	<input type="text" readonly="readonly" disabled="disabled" id="registnum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="giveusernum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="giveprice">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="rechargenum">
+<!--                  	<br/> -->
+<!--                  	<input type="text" readonly="readonly" disabled="disabled" id="totalrechargenum"> -->
+<!--                  	<input type="text" readonly="readonly" disabled="disabled" id="totalrechargeprice"> -->
+                 	<input type="text" readonly="readonly" disabled="disabled" id="rechargeprice">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="cashnum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="cashprice">
+                 </p>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+    
+        var editFlag = [[${@permission.hasPermi('system:statrecord:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:statrecord:remove')}]];
+        var prefix = ctx + "system/statrecord";
+        
+        $(function() {
+        	list();
+        	$('.time-input').datetimepicker({
+                format: 'yyyyMMdd',
+                autoclose: true,
+                minView: 0,
+                minuteStep:1
+            });
+        	total();
+        });
+        
+        function init(){
+        	total();
+        	$.table.search()
+        }
+        
+        function reset(){
+        	$.form.reset();
+        	total();
+        }
+        
+        function total(){
+        	var config = {
+       	        url: prefix + "/listTotal",
+       	        type: "post",
+       	        dataType: "json",
+       	        data: $('#formId').serialize(),
+       	        success: function(result) {
+       	        	if(result.data){
+       	        		$("#registnum").val("注册人数："+result.data.registnum)
+       	        		$("#giveusernum").val("赠送人数："+result.data.giveusernum)
+       	        		$("#giveprice").val("赠送金额："+(result.data.giveprice || 0))
+       	        		$("#rechargenum").val("充值人数："+result.data.rechargenum)
+       	        		$("#rechargeprice").val("充值金额："+(result.data.rechargeprice || 0))
+//        	        		$("#totalrechargenum").val("总充值人数："+result.data.totalrechargenum)
+//        	        		$("#totalrechargeprice").val("总充值金额："+(result.data.totalrechargeprice || 0))
+       	        		$("#cashnum").val("提现人数："+result.data.cashnum)
+       	        		$("#cashprice").val("提现金额："+(result.data.cashprice || 0))
+       	        	}else{
+       	        		$("#registnum").val("注册人数：0")
+       	        		$("#giveusernum").val("赠送人数：0")
+       	        		$("#giveprice").val("赠送金额：0")
+       	        		$("#rechargenum").val("充值人数：0")
+       	        		$("#rechargeprice").val("充值金额：0")
+//        	        		$("#totalrechargenum").val("总充值人数：0")
+//        	        		$("#totalrechargeprice").val("总充值金额：0")
+       	        		$("#cashnum").val("提现人数：0")
+       	        		$("#cashprice").val("提现金额：0")
+       	        	}
+       	        }
+       	    };
+       	    $.ajax(config)
+        }
+
+        function list(){
+            var options = {
+                url: prefix + "/list",
+                showColumns:false,
+                showSearch:true,
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "统计记录",
+                sortName: "id",
+		        sortOrder: "desc",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'id', 
+                    title : '主键ID',
+                    visible: false
+                },
+                {
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                 	    return $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field : 'registnum', 
+                    title : '当天注册人数'
+                },
+                {
+                    field : 'giveusernum', 
+                    title : '当天赠送人数'
+                },
+                {
+                    field : 'giveprice', 
+                    title : '当天赠送总金额'
+                },
+                {
+                    field : 'newrechargenum', 
+                    title : '新充值人数'
+                },
+                {
+                    field : 'newrechargeprice', 
+                    title : '新充值金额'
+                },
+                {
+                    field : 'totalrechargenum', 
+                    title : '总充值人数'
+                },
+                {
+                    field : 'totalrechargeprice', 
+                    title : '总充值金额'
+                },
+                {
+                    field : 'cashnum', 
+                    title : '当天提现人数'
+                },
+                {
+                    field : 'cashprice', 
+                    title : '当天提现金额'
+                },
+                {
+                    field : 'daily', 
+                    title : '统计日期'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        }
+    </script>
+</body>
+</html>

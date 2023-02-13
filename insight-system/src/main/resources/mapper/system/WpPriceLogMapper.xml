@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpPriceLogMapper">
+    
+    <resultMap type="WpPriceLog" id="WpPriceLogResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="putel"    column="putel"    />
+        <result property="toputel"    column="toputel"    />
+        <result property="oid"    column="oid"    />
+        <result property="type"    column="type"    />
+        <result property="account"    column="account"    />
+        <result property="title"    column="title"    />
+        <result property="content"    column="content"    />
+        <result property="time"    column="time"    />
+        <result property="nowmoney"    column="nowmoney"    />
+    </resultMap>
+
+    <sql id="selectWpPriceLogVo">
+        select t.id, t.uid, t.oid, t.type, t.account, t.title, t.content, t.time, t.nowmoney ,u.utel,p.utel putel,top2.utel toputel
+        from wp_price_log t
+        left join wp_userinfo u on u.uid = t.uid
+        left join wp_userinfo p on p.uid = u.oid
+        left join wp_userinfo top2 on top2.uid = u.topid
+    </sql>
+
+    <select id="selectWpPriceLogList" parameterType="WpPriceLog" resultMap="WpPriceLogResult">
+        <include refid="selectWpPriceLogVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="utel != null and utel != '' "> and u.`utel` = #{utel}</if>
+            <if test="putel != null and putel != '' "> and p.`utel` = #{putel}</if>
+            <if test="toputel != null and toputel != '' "> and top2.`utel` = #{toputel}</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectPriceLogList" parameterType="WpPriceLog" resultType="PriceLogResp">
+        select t.type, t.account, t.title, t.content, t.time, t.nowmoney ,u.utel
+        from wp_price_log t
+        left join wp_userinfo u on u.uid = t.uid
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="utel != null and utel != '' "> and u.`utel` = #{utel}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpPriceLogById" parameterType="Integer" resultMap="WpPriceLogResult">
+        <include refid="selectWpPriceLogVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpPriceLog" parameterType="WpPriceLog" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_price_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="oid != null ">`oid`,</if>
+            <if test="type != null ">`type`,</if>
+            <if test="account != null  and account != ''">`account`,</if>
+            <if test="title != null  and title != ''">`title`,</if>
+            <if test="content != null  and content != ''">`content`,</if>
+            <if test="time != null ">`time`,</if>
+            <if test="nowmoney != null ">`nowmoney`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="oid != null ">#{oid},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="account != null  and account != ''">#{account},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="time != null ">#{time},</if>
+            <if test="nowmoney != null ">#{nowmoney},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpPriceLog" parameterType="WpPriceLog">
+        update wp_price_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="oid != null ">`oid` = #{oid},</if>
+            <if test="type != null ">`type` = #{type},</if>
+            <if test="account != null  and account != ''">`account` = #{account},</if>
+            <if test="title != null  and title != ''">`title` = #{title},</if>
+            <if test="content != null  and content != ''">`content` = #{content},</if>
+            <if test="time != null ">`time` = #{time},</if>
+            <if test="nowmoney != null ">`nowmoney` = #{nowmoney},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpPriceLogById" parameterType="Integer">
+        delete from wp_price_log where id = #{id}
+    </delete>
+
+    <delete id="deleteWpPriceLogByIds" parameterType="String">
+        delete from wp_price_log where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

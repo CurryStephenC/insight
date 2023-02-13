@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('用户信息')" />
+	<th:block th:include="include :: select2-css" />
+</head>
+<body>
+    <div class="main-content">
+        <form class="form-horizontal" id="form-user-edit" th:object="${user}">
+            <input id="userId" name="userId"  type="hidden"  th:field="*{userId}" />
+            <h4 class="form-header h4">基本信息</h4>
+            <div class="row">
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">负责人：</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" name="leader" th:field="*{leader}">
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">联系电话：</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" name="phone" th:field="*{phone}">
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">银行卡号：</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" name="bankcardnum" th:field="*{bankcardnum}">
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">银行信息：</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" name="bankcardmessage" th:field="*{bankcardmessage}">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+            	<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">支付宝账号：</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" name="alipayaccount" th:field="*{alipayaccount}">
+						</div>
+					</div>
+				</div>
+            	<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">微信账号：</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" name="wechataccount" th:field="*{wechataccount}">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+            	<div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>登录账号：</label>
+                        <div class="col-sm-8">
+                            <input id="loginName1" name="loginName1" class="form-control" type="text" readonly="readonly" th:field="*{loginName1}" style="width: 25%;float: left;"/>
+                            <input id="loginName" name="loginName" class="form-control" type="text" readonly="readonly" th:field="*{loginName}" style="width: 70%;float:right;"/>
+                        </div>
+                    </div>
+                </div>
+				<div class="col-sm-6">
+					<div class="form-group">
+						<label class="col-sm-3 control-label">邮箱：</label>
+						<div class="col-sm-8">
+							<input class="form-control" type="text" name="email" th:field="*{email}">
+						</div>
+					</div>
+				</div>
+			</div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-sm-offset-5 col-sm-10">
+            <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+<!--             <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button> -->
+        </div>
+    </div>
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: select2-js" />
+	<script type="text/javascript">
+		var prefix = ctx + "system/deptuser";
+        
+        $("#form-user-edit").validate({
+        	onkeyup: false,
+        	rules:{
+        		phonenumber:{
+        			isPhone:true,
+                    remote: {
+                        url: prefix + "/checkPhoneUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                        	"userId": function() {
+                        		return $("#userId").val();
+                            },
+                			"phonenumber": function() {
+                                return $.common.trim($("#phonenumber").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                        	return $.validate.unique(data);
+                        }
+                    }
+				},
+        	},
+        	messages: {
+        		"phonenumber":{
+                	remote: "手机号码已经存在"
+		        }
+            },
+            focusCleanup: true
+        });
+        
+        function submitHandler() {
+	        if ($.validate.form()) {
+	        	var data = $("#form-user-edit").serializeArray();
+	        	$.operate.saveModal(prefix + "/edit2", data);
+	        }
+	    }
+
+		
+    </script>
+</body>
+</html>

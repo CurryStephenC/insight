@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增通知公告')" />
+	<th:block th:include="include :: summernote-css" />
+	<th:block th:include="include :: datetimepicker-css" />
+    <th:block th:include="include :: jasny-bootstrap-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-notice-add">
+			<div class="form-group">	
+				<label class="col-sm-2 control-label">公告标题：</label>
+				<div class="col-sm-10">
+					<input id="noticeTitle" name="noticeTitle" class="form-control" type="text" required>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-2 control-label">跳转地址：</label>
+				<div class="col-sm-10">
+					<input id="tourl" name="tourl" class="form-control" type="text" >
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-2 control-label">时间段：</label>
+				<div class="col-sm-10">
+					<input type="text" class="time-input form-control" style="width: 40%;float: left" placeholder="开始时间" name="begintime" required/>
+					<input type="text" class="time-input form-control" style="width: 40%;margin-left: 10px;float: left" placeholder="结束时间" name="endtime" required/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">公告类型：</label>
+				<div class="col-sm-10">
+					<select name="noticeType" class="form-control m-b" th:with="type=${@dict.getType('sys_notice_type')}">
+	                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+	                </select>
+				</div>
+			</div>
+			<div class="form-group">    
+                <label class="col-sm-2 control-label">图片地址：</label>
+                <div class="fileinput fileinput-new col-sm-10" data-provides="fileinput">
+			        <div class="fileinput-new thumbnail" style="width: 140px; height: 140px;">
+			          <img src="" >
+			        </div>
+			        <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+			        <div>
+			          <span class="btn btn-white btn-file"><span class="fileinput-new">选择图片</span><span class="fileinput-exists">更改</span><input id="file" type="file"></span>
+			        </div>
+                    <input id="picurl" name="picurl" class="form-control" type="text" readonly="readonly" style="width: 100%">
+		      	</div>
+            </div>
+			<div class="form-group">	
+				<label class="col-sm-2 control-label">公告内容：</label>
+				<div class="col-sm-10">
+				    <input id="noticeContent" name="noticeContent" type="hidden">
+				    <div class="summernote"></div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">公告状态：</label>
+				<div class="col-sm-10">
+				    <div class="radio-box" th:each="dict : ${@dict.getType('sys_notice_status')}">
+						<input type="radio" th:id="${dict.dictCode}" name="status" th:value="${dict.dictValue}" th:checked="${dict.default}">
+						<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: summernote-js" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <th:block th:include="include :: jasny-bootstrap-js" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/notice";
+
+	    $('.summernote').summernote({
+	    	placeholder: '请输入公告内容',
+			height : 192,
+			lang : 'zh-CN',
+			followingToolbar: false,
+			callbacks: {
+                onImageUpload: function (files) {
+                    sendFile(files[0], this);
+                }
+            }
+		});
+	    
+	    // 上传文件
+	    function sendFile(file, obj) {
+	        var data = new FormData();
+	        data.append("file", file);
+	        $.ajax({
+	            type: "POST",
+	            url: ctx + "common/upload",
+	            data: data,
+	            cache: false,
+	            contentType: false,
+	            processData: false,
+	            dataType: 'json',
+	            success: function(result) {
+	                if (result.code == web_status.SUCCESS) {
+	                	$(obj).summernote('editor.insertImage', result.url, result.fileName);
+					} else {
+						$.modal.alertError(result.msg);
+					}
+	            },
+	            error: function(error) {
+	                $.modal.alertWarning("图片上传失败。");
+	            }
+	        });
+	    }
+		
+		$("#form-notice-add").validate({
+			focusCleanup: true
+		});
+		$('#file').on('change', function() {
+			$("#picurl").val('');
+        	if(this.files.length == 0){
+        		return;
+        	}
+            var formdata = new FormData();
+            formdata.append("file", this.files[0]);
+            $.ajax({
+                url: ctx + "common/upload",
+                data: formdata,
+                type: "post",
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                	console.log(result);
+                	if(result.code == 0){
+//                 		$("#fileurl_span").html(result.url);
+                		$("#picurl").val(result.url);
+                	}
+                }
+            })
+        })
+		function submitHandler() {
+	        if ($.validate.form()) {
+	        	var sHTML = $('.summernote').summernote('code');
+				$("#noticeContent").val(sHTML);
+				$.operate.save(prefix + "/add", $('#form-notice-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('提现手动充值列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>收支类型：</p>
+                                <select name="bptype" th:with="type=${@dict.getType('wp_balance_type')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>提现类型：</p>
+                                <select name="banktype" th:with="type=${@dict.getType('wp_balance_banktype')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>用户：</p>
+                                <input type="text" name="utel" />
+                            </li>
+                            <li>
+                                <p>上级：</p>
+                                <input type="text" name="outel" />
+                            </li>
+                            <li>
+                                <p>销售：</p>
+                                <input type="text" name="toputel" />
+                            </li>
+                            <li>
+                                <p>是否通过：</p>
+                                <select name="isverified" th:with="type=${@dict.getType('wp_balance_isverified')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>订单编号：</p>
+                                <input type="text" name="balanceSn"/>
+                            </li>
+<!--                             <li> -->
+<!--                                 <p>是否推送：</p> -->
+<!--                                 <select name="ispush" th:with="type=${@dict.getType('wp_balance_ispush')}"> -->
+<!--                                     <option value="">所有</option> -->
+<!--                                     <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option> -->
+<!--                                 </select> -->
+<!--                             </li> -->
+                            <li>
+                                <p>正常用户：</p>
+                                <select name="normaltype" th:with="type=${@dict.getType('wp_userinfo_normal')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    <option value="">所有</option>
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>时间：</p>
+                                <input type="text" class="time-input" placeholder="开始时间" name="params[beginTime]" data-format="yyyyMMdd"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" placeholder="结束时间" name="params[endTime]" data-format="yyyyMMdd"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="init()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:balance:add">
+                    <i class="fa fa-plus"></i> 充值
+                </a>
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:balance:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:balance:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a> -->
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:balance:export">
+                    <i class="fa fa-download"></i> 导出
+                 </a>
+                 <p>
+                 	<input type="text" readonly="readonly" disabled="disabled" id="withdraw">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="recharge">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="todayMoney">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="todayNum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="yesMoney">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="yesNum">
+                 </p>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:balance:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:balance:remove')}]];
+        var submitFlag = [[${@permission.hasPermi('system:balance:submit')}]];
+        var bptypeDatas = [[${@dict.getType('wp_balance_type')}]];
+        var banktypeDatas = [[${@dict.getType('wp_balance_banktype')}]];
+        var isverifiedDatas = [[${@dict.getType('wp_balance_isverified')}]];
+        var ispushDatas = [[${@dict.getType('wp_balance_ispush')}]];
+        var prefix = ctx + "system/balance";
+        var prefix_bankcard = ctx + "system/bankcard";
+        
+        function init(){
+        	total();
+        	$.table.search()
+        }
+        
+        function reset(){
+        	$.form.reset();
+        	total();
+        }
+        
+        function total(){
+        	var config = {
+       	        url: prefix + "/listTotal",
+       	        type: "post",
+       	        dataType: "json",
+       	        data: $('#formId').serialize(),
+       	        success: function(result) {
+       	        	if(result.data){
+       	        		$("#withdraw").val("提现金额："+result.data.withdraw.toFixed(2))
+       	        		$("#recharge").val("充值金额："+result.data.recharge.toFixed(2))
+       	        		$("#todayMoney").val("今日金额："+result.data.todayMoney)
+       	        		$("#todayNum").val("今日人数："+result.data.todayNum)
+       	        		$("#yesMoney").val("昨日金额："+(result.data.yesMoney ? result.data.yesMoney.toFixed(2) : 0 ))
+       	        		$("#yesNum").val("昨日人数："+result.data.yesNum)
+       	        	}else{
+       	        		$("#withdraw").val("提现金额：0")
+       	        		$("#recharge").val("充值金额：0")
+       	        		$("#todayMoney").val("今日金额：0")
+       	        		$("#todayNum").val("今日人数：0")
+       	        		$("#yesMoney").val("昨日金额：0")
+       	        		$("#yesNum").val("昨日人数：0")
+       	        	}
+       	        }
+       	    };
+       	    $.ajax(config)
+        }
+
+        $(function() {
+            total();
+            list();
+        });
+
+        function list() {
+            var options = {
+                url: prefix + "/list",
+                showColumns:true,
+                showSearch:true,
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "金额",
+                sortName: "bpid",
+		        sortOrder: "desc",
+		        showPageGo: true,
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'bpid', 
+                    title : '主键ID',
+                    visible: false
+                },
+                {
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                 	    return $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field : 'bptype', 
+                    title : '收支类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(bptypeDatas, value);
+                    }
+                },
+                {
+                    field : 'bptime', 
+                    title : '操作时间',
+                    formatter: function(value, row, index) {
+                    	return $.common.formatDate(value);
+                    }
+                },
+                {
+                	field : 'banktype', 
+                    title : '提现类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(banktypeDatas, value);
+                    }
+                },
+//                 {
+//                     field : 'banktype', 
+//                     title : '提现类型',
+//                     formatter: function(value, row, index) {
+//                     	if(row.bptype == 0){
+//                     		if(value == 1){
+//                     			return "银行卡";
+//                     		}else if(value == 3){
+//                     			return "数字货币";
+//                     		}else{
+//                     			return value;
+//                     		}
+//                     	}
+//                     }
+//                 },
+                {
+                    field : 'bpprice', 
+                    title : '收支金额'
+                },
+                {
+                    field : 'realprice', 
+                    title : '实际到账金额'
+                },
+                {
+                    field : 'remarks', 
+                    title : '备注'
+                },
+                {
+                    field : 'uid', 
+                    title : '用户ID',
+                    visible: false
+                },
+                {
+                    field : 'utel', 
+                    title : '用户'
+                },
+                {
+                    field : 'outel', 
+                    title : '上级'
+                },
+                {
+                    field : 'toputel', 
+                    title : '销售'
+                },
+                {
+                    field : 'isverified', 
+                    title : '是否通过',
+                    formatter: function(value, row, index) {
+                    	var msg = "";
+                    	if(row.ispush == 1){
+                    		if(value == 0){
+                    			return "待回调";
+                    		}else if(value == 1){
+                    			return '<span class="badge badge-danger">成功</span>';
+                    		}else if(value == 2){
+                    			return "打款失败";
+                    		}else{
+                    			return value;
+                    		}
+                    	}else{
+                       		return $.table.selectDictLabel(isverifiedDatas, value);
+                    	}
+                    }
+                },
+                {
+                    field : 'cltime', 
+                    title : '审核时间',
+                    formatter: function(value, row, index) {
+                    	if(value)
+                    	return $.common.formatDate(value);
+                    }
+                },
+                {
+                    field : 'bpbalance', 
+                    title : '余额'
+                },
+                {
+                    field : 'btime', 
+                    title : '提交时间',
+                    visible : false,
+                    formatter: function(value, row, index) {
+                    	return $.common.formatDate(value);
+                    }
+                },
+                {
+                    field : 'regPar', 
+                    title : '手续费',
+                    visible : false
+                },
+                {
+                    field : 'balanceSn', 
+                    title : '订单编号'
+                },
+                {
+                    field : 'payType', 
+                    title : '支付方式',
+                    visible :false
+                },
+                {
+                    field : 'userremark', 
+                    title : '用户备注'
+                },
+                {
+                    field : 'thirdid', 
+                    title : '支付方单号',
+                    visible: false
+                },
+//                 {
+//                     field : 'ispush', 
+//                     title : '是否推送',//0：待推送，1：已推送
+//                     formatter: function(value, row, index) {
+//                     	if(row.bptype == 0)
+//                        return $.table.selectDictLabel(ispushDatas, value);
+//                     }
+//                 },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        if(row.bptype==0 && row.isverified == 0 && row.ispush == 0){
+                        	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.bpid + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        	actions.push('<a class="btn btn-primary btn-xs ' + submitFlag + '" href="javascript:void(0)" onclick="audit(\'' + row.bpid + '\',\''+row.banktype+'\',\''+row.uid+'\',\''+row.payType+'\')"><i class="fa fa-remove"></i>审核</a> ');
+                        }
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.bpid + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        }
+        
+        function audit(id,banktype,uid,payTag){
+        	if(banktype == 3){
+// 	        	$.modal.loading("请稍后...");
+// 	        	$.post(prefix_bankcard + "/user/"+uid, {}, function(result) {
+// 						$.modal.closeLoading();
+// 					if (result.code == 0) {
+						var _html = '';
+// 						_html += '<br/>钱包类型：'+result.data.cryptocurrency;
+// 						_html += '<br/>钱包地址：'+result.data.walletaddr;
+						_html += '<br/>钱包：'+payTag;
+						_html += '<br/><br/><input type="text" placeholder="备注" id="remarks">';
+			        	layer.confirm('确认提交吗？<br/>'+_html, {
+			    	        icon: 3,
+			    	        area:"500px",
+			    	        title: "审核",
+			    	        btn: ['通过', '驳回']
+			    	    }, function (index) {
+			    	    	var param = {
+			    					"bpid" : id,
+			    					"ispush" : 1,
+			    					"remarks" : $("#remarks").val()
+			    			}
+			    			$.post(prefix + "/auditOrder", param, function(result) {
+			    				if (result.code == 0) {
+			    					$.modal.msgSuccess("Success");
+			    					$.table.refresh();
+			                    } else {
+			    					$.modal.alertError(result.msg);
+			    				}
+			    				$.modal.closeLoading();
+			    			});
+			    	    }, function (index) {
+			    	    	var param = {
+			    					"bpid" : id,
+			    					"isverified" : 2,
+			    					"remarks" : $("#remarks").val()
+			    			}
+			    			$.post(prefix + "/auditOrder", param, function(result) {
+			    				if (result.code == 0) {
+			    					$.modal.msgSuccess("Success");
+			    					$.table.refresh();
+			                    } else {
+			    					$.modal.alertError(result.msg);
+			    				}
+			    				$.modal.closeLoading();
+			    			});
+			    	    });
+// 	                } else {
+// 						$.modal.alertError(result.msg);
+// 					}
+// 				});
+	        	return;
+        	}
+        	layer.confirm('通过或驳回', {//<br/><input type="text" placeholder="备注" id="remarks">
+    	        icon: 3,
+    	        title: "审核",
+    	        btn: ['通过', '驳回']
+    	    }, function (index) {
+    	    	var param = {
+    					"bpid" : id,
+    					"ispush" : 1,
+    					"remarks" : $("#remarks").val()
+    			}
+    			$.post(prefix + "/auditOrder", param, function(result) {
+    				if (result.code == 0) {
+    					$.modal.msgSuccess("Success");
+    					$.table.refresh();
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+    	    }, function (index) {
+    	    	var param = {
+    					"bpid" : id,
+    					"isverified" : 2,
+    					"remarks" : $("#remarks").val()
+    			}
+    			$.post(prefix + "/auditOrder", param, function(result) {
+    				if (result.code == 0) {
+    					$.modal.msgSuccess("Success");
+    					$.table.refresh();
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+    	    });
+        	
+					
+        }
+    </script>
+</body>
+</html>

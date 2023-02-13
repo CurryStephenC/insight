@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpCheckinRewardDailyMapper">
+    
+    <resultMap type="WpCheckinRewardDaily" id="WpCheckinRewardDailyResult">
+        <result property="id"    column="id"    />
+        <result property="minmoney"    column="minmoney"    />
+        <result property="maxmoney"    column="maxmoney"    />
+        <result property="money"    column="money"    />
+        <result property="money2"    column="money2"    />
+        <result property="times"    column="times"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpCheckinRewardDailyVo">
+        select t.id, t.minmoney, t.maxmoney, t.money, t.money2, t.times, t.createtime from wp_checkin_reward_daily t
+    </sql>
+
+    <select id="selectWpCheckinRewardDailyList" parameterType="WpCheckinRewardDaily" resultMap="WpCheckinRewardDailyResult">
+        <include refid="selectWpCheckinRewardDailyVo"/>
+        <where>  
+            <if test="minmoney != null "> and t.`minmoney` = #{minmoney}</if>
+            <if test="maxmoney != null "> and t.`maxmoney` = #{maxmoney}</if>
+            <if test="money != null "> and t.`money` = #{money}</if>
+            <if test="money2 != null "> and t.`money2` = #{money2}</if>
+            <if test="times != null "> and t.`times` = #{times}</if>
+            <if test="createtime != null "> and t.`createtime` = #{createtime}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpCheckinRewardDailyById" parameterType="Integer" resultMap="WpCheckinRewardDailyResult">
+        <include refid="selectWpCheckinRewardDailyVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpCheckinRewardDaily" parameterType="WpCheckinRewardDaily" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_checkin_reward_daily
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="minmoney != null ">`minmoney`,</if>
+            <if test="maxmoney != null ">`maxmoney`,</if>
+            <if test="money != null ">`money`,</if>
+            <if test="money2 != null ">`money2`,</if>
+            <if test="times != null ">`times`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="minmoney != null ">#{minmoney},</if>
+            <if test="maxmoney != null ">#{maxmoney},</if>
+            <if test="money != null ">#{money},</if>
+            <if test="money2 != null ">#{money2},</if>
+            <if test="times != null ">#{times},</if>
+            <if test="createtime != null ">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpCheckinRewardDaily" parameterType="WpCheckinRewardDaily">
+        update wp_checkin_reward_daily
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="minmoney != null ">`minmoney` = #{minmoney},</if>
+            <if test="maxmoney != null ">`maxmoney` = #{maxmoney},</if>
+            <if test="money != null ">`money` = #{money},</if>
+            <if test="money2 != null ">`money2` = #{money2},</if>
+            <if test="times != null ">`times` = #{times},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpCheckinRewardDailyById" parameterType="Integer">
+        delete from wp_checkin_reward_daily where id = #{id}
+    </delete>
+
+    <delete id="deleteWpCheckinRewardDailyByIds" parameterType="String">
+        delete from wp_checkin_reward_daily where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpUserinfoMapper">
+    
+    <resultMap type="WpUserinfo" id="WpUserinfoResult">
+        <result property="uid"    column="uid"    />
+        <result property="username"    column="username"    />
+        <result property="upwd"    column="upwd"    />
+        <result property="utel"    column="utel"    />
+        <result property="outel"    column="outel"    />
+        <result property="toputel"    column="toputel"    />
+        <result property="utime"    column="utime"    />
+        <result property="agenttype"    column="agenttype"    />
+        <result property="otype"    column="otype"    />
+        <result property="ustatus"    column="ustatus"    />
+        <result property="normaltype"    column="normaltype"    />
+        <result property="oid"    column="oid"    />
+        <result property="address"    column="address"    />
+        <result property="portrait"    column="portrait"    />
+        <result property="lastlog"    column="lastlog"    />
+        <result property="managername"    column="managername"    />
+        <result property="comname"    column="comname"    />
+        <result property="comqua"    column="comqua"    />
+        <result property="rebate"    column="rebate"    />
+        <result property="feerebate"    column="feerebate"    />
+        <result property="usertype"    column="usertype"    />
+        <result property="wxtype"    column="wxtype"    />
+        <result property="openid"    column="openid"    />
+        <result property="nickname"    column="nickname"    />
+        <result property="logintime"    column="logintime"    />
+        <result property="usermoney"    column="usermoney"    />
+        <result property="userpoint"    column="userpoint"    />
+        <result property="minprice"    column="minprice"    />
+        <result property="realname"    column="realname"    />
+        <result property="email"    column="email"    />
+        <result property="idcard"    column="idcard"    />
+        <result property="city"    column="city"    />
+        <result property="street"    column="street"    />
+        <result property="number"    column="number"    />
+        <result property="vipid"    column="vipid"    />
+        <result property="istop"    column="istop"    />
+        <result property="deposit"    column="deposit"    />
+        <result property="topid"    column="topid"    />
+        <result property="ibstatus"    column="ibstatus"    />
+        <result property="userphoto"    column="userphoto"    />
+        <result property="withdrawpsd"    column="withdrawpsd"    />
+        <result property="newtask"    column="newtask"    />
+        <result property="comenewtask"    column="comenewtask"    />
+        <result property="ordermaxprice"    column="ordermaxprice"    />
+        <result property="ibtime"    column="ibtime"    />
+    </resultMap>
+
+    <sql id="selectWpUserinfoVo">
+        select t.uid, t.username, t.upwd, t.utel, t.utime, t.agenttype, t.otype, t.ustatus, t.normaltype, t.oid, t.address, t.portrait, t.lastlog,t.withdrawpsd,t.ordermaxprice, 
+        t.managername, t.comname, t.comqua, t.rebate, t.feerebate, t.usertype, t.wxtype, t.openid, t.nickname, t.logintime, t.usermoney, t.userpoint,t.newtask,t.comenewtask, 
+        t.minprice, t.realname,t.ibtime, t.email, t.idcard, t.city, t.street, t.number, t.vipid, t.istop, t.deposit, t.topid, t.ibstatus, t.userphoto,ttop.utel toputel,o.utel outel 
+        from wp_userinfo t
+        left join wp_userinfo o on o.uid=t.oid
+        left join wp_userinfo ttop on ttop.uid=t.topid
+    </sql>
+	<sql id="listWhere">
+		<where>  
+            <if test="username != null  and username != ''"> and t.`username` like concat('%', #{username}, '%')</if>
+            <if test="upwd != null  and upwd != ''"> and t.`upwd` = #{upwd}</if>
+            <if test="utel != null  and utel != ''"> and t.`utel` = #{utel}</if>
+            <if test="outel != null  and outel != ''"> and o.`utel` = #{outel}</if>
+            <if test="toputel != null  and toputel != ''"> and ttop.`utel` = #{toputel}</if>
+            <if test="otype != null "> and t.`otype` = #{otype}</if>
+            <if test="ustatus != null "> and t.`ustatus` = #{ustatus}</if>
+            <if test="normaltype != null "> and t.`normaltype` = #{normaltype}</if>
+            <if test="email != null  and email != ''"> and t.`email` = #{email}</if>
+            <if test="withdrawpsd != null  and withdrawpsd != ''"> and t.`withdrawpsd` = #{withdrawpsd}</if>
+            <if test="istop != null "> and t.`istop` = #{istop}</if>
+            <if test="oid != null "> and t.`oid` = #{oid}</if>
+            <if test="topid != null "> and t.`topid` = #{topid}</if>
+            <if test="ibstatus != null "> and t.`ibstatus` = #{ibstatus}</if>
+            <if test="newtask != null "> and t.`newtask` = #{newtask}</if>
+            <if test="comenewtask != null "> and t.`comenewtask` = #{comenewtask}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND from_unixtime(t.`utime`,'%Y%m%d') &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND from_unixtime(t.`utime`,'%Y%m%d') &lt;= #{params.endTime}
+			</if>
+            <if test="params.loginbeginTime != null and params.loginbeginTime != ''"><!-- 开始时间检索 -->
+				AND from_unixtime(t.`lastlog`,'%Y%m%d') &gt;= #{params.loginbeginTime}
+			</if>
+			<if test="params.loginendTime != null and params.loginendTime != ''"><!-- 结束时间检索 -->
+				AND from_unixtime(t.`lastlog`,'%Y%m%d') &lt;= #{params.loginendTime}
+			</if>
+			<if test="topids != null">
+				AND t.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+			<if test="oids != null">
+				AND t.`oid` in 
+				<foreach item="uid" collection="oids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+        </where>
+	</sql>
+    <select id="selectWpUserinfoList" parameterType="WpUserinfo" resultMap="WpUserinfoResult">
+        <include refid="selectWpUserinfoVo"/>
+        <include refid="listWhere"/>
+    </select>
+    
+    <select id="selectDailyCount" parameterType="WpUserinfo" resultType="Integer">
+    	select count(1)
+    	from wp_userinfo t
+        left join wp_userinfo o on o.uid=t.oid
+        left join wp_userinfo ttop on ttop.uid=t.topid
+        <include refid="listWhere"/>
+    </select>
+    <select id="selectChildList" parameterType="ChildListResp" resultType="ChildListResp">
+        select t.utel,t.comenewtask, t.utime, sum(r.buymoney) buymoney,sum(r.creditmoney) creditmoney
+        from wp_userinfo t
+        left join wp_financial_record r on t.uid=r.uid
+        <where>  
+            <if test="oid != null "> and t.`oid` = #{oid}</if>
+        </where>
+        group by t.uid order by t.uid desc
+    </select>
+    
+    <select id="selectWpUserinfoById" parameterType="Integer" resultMap="WpUserinfoResult">
+        <include refid="selectWpUserinfoVo"/>
+        where t.uid = #{uid}
+    </select>
+    <select id="selectUserByPhone" parameterType="java.lang.String" resultMap="WpUserinfoResult">
+        <include refid="selectWpUserinfoVo"/>
+        where t.utel = #{phone}
+    </select>
+    
+    <!-- 不要随意修改 -->
+    <select id="selectUserinfoTree" parameterType="Integer" resultType="com.wjyoption.common.core.domain.Ztree">
+        SELECT uid AS id,concat(utel,' ',ROUND(usermoney)) AS 'name',utel AS 'title',oid AS pId FROM (
+              SELECT t1.uid,t1.oid,t1.utel,t1.usermoney,IF(FIND_IN_SET(oid, @pids) > 0, @pids := CONCAT(@pids, ',', uid), 0)  AS isbig
+              FROM (
+                   SELECT t.`uid`,t.`oid`,t.utel,t.`usermoney` FROM `wp_userinfo` t ORDER BY t.`uid`, t.`oid`
+                  ) t1,
+                  (SELECT @pids := #{oid}) t2
+             ) t3 WHERE isbig>0
+    </select>
+        
+    <insert id="insertWpUserinfo" parameterType="WpUserinfo" useGeneratedKeys="true" keyProperty="uid">
+        insert into wp_userinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null  and username != ''">`username`,</if>
+            <if test="upwd != null  and upwd != ''">`upwd`,</if>
+            <if test="utel != null  and utel != ''">`utel`,</if>
+            <if test="utime != null ">`utime`,</if>
+            <if test="agenttype != null ">`agenttype`,</if>
+            <if test="otype != null ">`otype`,</if>
+            <if test="ustatus != null ">`ustatus`,</if>
+            <if test="normaltype != null ">`normaltype`,</if>
+            <if test="oid != null ">`oid`,</if>
+            <if test="address != null  and address != ''">`address`,</if>
+            <if test="portrait != null  and portrait != ''">`portrait`,</if>
+            <if test="lastlog != null ">`lastlog`,</if>
+            <if test="managername != null  and managername != ''">`managername`,</if>
+            <if test="comname != null  and comname != ''">`comname`,</if>
+            <if test="comqua != null  and comqua != ''">`comqua`,</if>
+            <if test="rebate != null  and rebate != ''">`rebate`,</if>
+            <if test="feerebate != null  and feerebate != ''">`feerebate`,</if>
+            <if test="usertype != null ">`usertype`,</if>
+            <if test="wxtype != null ">`wxtype`,</if>
+            <if test="openid != null  and openid != ''">`openid`,</if>
+            <if test="nickname != null  and nickname != ''">`nickname`,</if>
+            <if test="logintime != null ">`logintime`,</if>
+            <if test="usermoney != null ">`usermoney`,</if>
+            <if test="userpoint != null ">`userpoint`,</if>
+            <if test="minprice != null ">`minprice`,</if>
+            <if test="realname != null  and realname != ''">`realname`,</if>
+            <if test="email != null  and email != ''">`email`,</if>
+            <if test="idcard != null  and idcard != ''">`idcard`,</if>
+            <if test="city != null  and city != ''">`city`,</if>
+            <if test="street != null  and street != ''">`street`,</if>
+            <if test="number != null  and number != ''">`number`,</if>
+            <if test="vipid != null ">`vipid`,</if>
+            <if test="istop != null ">`istop`,</if>
+            <if test="deposit != null ">`deposit`,</if>
+            <if test="topid != null ">`topid`,</if>
+            <if test="ibstatus != null ">`ibstatus`,</if>
+            <if test="newtask != null ">`newtask`,</if>
+            <if test="comenewtask != null ">`comenewtask`,</if>
+            <if test="ordermaxprice != null ">`ordermaxprice`,</if>
+            <if test="ibtime != null ">`ibtime`,</if>
+            <if test="userphoto != null  and userphoto != ''">`userphoto`,</if>
+            <if test="withdrawpsd != null  and withdrawpsd != ''">`withdrawpsd`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null  and username != ''">#{username},</if>
+            <if test="upwd != null  and upwd != ''">#{upwd},</if>
+            <if test="utel != null  and utel != ''">#{utel},</if>
+            <if test="utime != null ">#{utime},</if>
+            <if test="agenttype != null ">#{agenttype},</if>
+            <if test="otype != null ">#{otype},</if>
+            <if test="ustatus != null ">#{ustatus},</if>
+            <if test="normaltype != null ">#{normaltype},</if>
+            <if test="oid != null ">#{oid},</if>
+            <if test="address != null  and address != ''">#{address},</if>
+            <if test="portrait != null  and portrait != ''">#{portrait},</if>
+            <if test="lastlog != null ">#{lastlog},</if>
+            <if test="managername != null  and managername != ''">#{managername},</if>
+            <if test="comname != null  and comname != ''">#{comname},</if>
+            <if test="comqua != null  and comqua != ''">#{comqua},</if>
+            <if test="rebate != null  and rebate != ''">#{rebate},</if>
+            <if test="feerebate != null  and feerebate != ''">#{feerebate},</if>
+            <if test="usertype != null ">#{usertype},</if>
+            <if test="wxtype != null ">#{wxtype},</if>
+            <if test="openid != null  and openid != ''">#{openid},</if>
+            <if test="nickname != null  and nickname != ''">#{nickname},</if>
+            <if test="logintime != null ">#{logintime},</if>
+            <if test="usermoney != null ">#{usermoney},</if>
+            <if test="userpoint != null ">#{userpoint},</if>
+            <if test="minprice != null ">#{minprice},</if>
+            <if test="realname != null  and realname != ''">#{realname},</if>
+            <if test="email != null  and email != ''">#{email},</if>
+            <if test="idcard != null  and idcard != ''">#{idcard},</if>
+            <if test="city != null  and city != ''">#{city},</if>
+            <if test="street != null  and street != ''">#{street},</if>
+            <if test="number != null  and number != ''">#{number},</if>
+            <if test="vipid != null ">#{vipid},</if>
+            <if test="istop != null ">#{istop},</if>
+            <if test="deposit != null ">#{deposit},</if>
+            <if test="topid != null ">#{topid},</if>
+            <if test="ibstatus != null ">#{ibstatus},</if>
+            <if test="newtask != null ">#{newtask},</if>
+            <if test="comenewtask != null ">#{comenewtask},</if>
+            <if test="ordermaxprice != null ">#{ordermaxprice},</if>
+            <if test="ibtime != null ">#{ibtime},</if>
+            <if test="userphoto != null  and userphoto != ''">#{userphoto},</if>
+            <if test="withdrawpsd != null  and withdrawpsd != ''">#{withdrawpsd},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpUserinfo" parameterType="WpUserinfo">
+        update wp_userinfo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="username != null  and username != ''">`username` = #{username},</if>
+            <if test="upwd != null  and upwd != ''">`upwd` = #{upwd},</if>
+            <if test="utel != null  and utel != ''">`utel` = #{utel},</if>
+            <if test="utime != null ">`utime` = #{utime},</if>
+            <if test="agenttype != null ">`agenttype` = #{agenttype},</if>
+            <if test="otype != null ">`otype` = #{otype},</if>
+            <if test="ustatus != null ">`ustatus` = #{ustatus},</if>
+            <if test="normaltype != null ">`normaltype` = #{normaltype},</if>
+            <if test="oid != null ">`oid` = #{oid},</if>
+            <if test="address != null  and address != ''">`address` = #{address},</if>
+            <if test="portrait != null  and portrait != ''">`portrait` = #{portrait},</if>
+            <if test="lastlog != null ">`lastlog` = #{lastlog},</if>
+            <if test="managername != null  and managername != ''">`managername` = #{managername},</if>
+            <if test="comname != null  and comname != ''">`comname` = #{comname},</if>
+            <if test="comqua != null  and comqua != ''">`comqua` = #{comqua},</if>
+            <if test="rebate != null  and rebate != ''">`rebate` = #{rebate},</if>
+            <if test="feerebate != null  and feerebate != ''">`feerebate` = #{feerebate},</if>
+            <if test="usertype != null ">`usertype` = #{usertype},</if>
+            <if test="wxtype != null ">`wxtype` = #{wxtype},</if>
+            <if test="openid != null  and openid != ''">`openid` = #{openid},</if>
+            <if test="nickname != null  and nickname != ''">`nickname` = #{nickname},</if>
+            <if test="logintime != null ">`logintime` = #{logintime},</if>
+            <if test="usermoney != null ">`usermoney` = #{usermoney},</if>
+            <if test="userpoint != null ">`userpoint` = #{userpoint},</if>
+            <if test="minprice != null ">`minprice` = #{minprice},</if>
+            <if test="realname != null  and realname != ''">`realname` = #{realname},</if>
+            <if test="email != null  and email != ''">`email` = #{email},</if>
+            <if test="idcard != null  and idcard != ''">`idcard` = #{idcard},</if>
+            <if test="city != null  and city != ''">`city` = #{city},</if>
+            <if test="street != null  and street != ''">`street` = #{street},</if>
+            <if test="number != null  and number != ''">`number` = #{number},</if>
+            <if test="vipid != null ">`vipid` = #{vipid},</if>
+            <if test="istop != null ">`istop` = #{istop},</if>
+            <if test="deposit != null ">`deposit` = #{deposit},</if>
+            <if test="topid != null ">`topid` = #{topid},</if>
+            <if test="ibstatus != null ">`ibstatus` = #{ibstatus},</if>
+            <if test="newtask != null ">`newtask` = #{newtask},</if>
+            <if test="ordermaxprice != null ">`ordermaxprice` = #{ordermaxprice},</if>
+            <if test="ibtime != null ">`ibtime` = #{ibtime},</if>
+            <if test="userphoto != null  and userphoto != ''">`userphoto` = #{userphoto},</if>
+            <if test="withdrawpsd != null  and withdrawpsd != ''">`withdrawpsd` = #{withdrawpsd},</if>
+        </trim>
+        where uid = #{uid}
+    </update>
+    <update id="updateMoney" parameterType="WpUserinfo">
+        update wp_userinfo
+        SET usermoney = usermoney + #{usermoney}
+        where uid = #{uid}
+    </update>
+    
+    <update id="updateAllNoib" >
+        update wp_userinfo
+        SET ibstatus = 0
+        where 2 > ibstatus
+    </update>
+    <update id="setAllNoOrderPrice" >
+        update wp_userinfo
+        SET ordermaxprice = 0
+        where uid > 0
+    </update>
+
+    <delete id="deleteWpUserinfoById" parameterType="Integer">
+        delete from wp_userinfo where uid = #{uid}
+    </delete>
+
+    <delete id="deleteWpUserinfoByIds" parameterType="String">
+        delete from wp_userinfo where uid in 
+        <foreach item="uid" collection="array" open="(" separator="," close=")">
+            #{uid}
+        </foreach>
+    </delete>
+    
+</mapper>

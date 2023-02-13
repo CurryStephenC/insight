@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('订单模块列表')" />
+    <th:block th:include="include :: layout-latest-css" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>用户：</p>
+                                <input type="text" name="utel"/>
+                            </li>
+                            <li>
+                                <p>销售：</p>
+                                <input type="text" name="toputel"/>
+                            </li>
+                            <li>
+                                <p>方向：</p>
+                                <select name="ostyle" >
+                                    <option value="">所有</option>
+                                    <option value="0">涨</option>
+                                    <option value="1">跌</option>
+                                </select>
+                                <input type="text" name="ostyle"/>
+                            </li>
+<!--                             <li> -->
+<!--                                 <p>建仓时间：</p> -->
+<!--                                 <input type="text" name="buytime"/> -->
+<!--                             </li> -->
+                            <li>
+                                <p>状态：</p>
+                                <select name="ostaus">
+                                    <option value="">所有</option>
+                                    <option value="0">建仓</option>
+                                    <option value="1">平仓</option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>是否盈利：</p>
+                                <select name="isWin" >
+                                    <option value="">所有</option>
+                                    <option value="1">盈利</option>
+                                    <option value="2">亏损</option>
+                                    <option value="3">无效</option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>正常用户：</p>
+                                <select name="normaltype" th:with="type=${@dict.getType('wp_userinfo_normal')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    <option value="">所有</option>
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>日期：</p>
+                                <input type="text" class="time-input" placeholder="开始时间" name="params[beginTime]" data-format="yyyyMMdd"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" placeholder="结束时间" name="params[endTime]" data-format="yyyyMMdd"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="init()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:order:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:order:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:order:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a> -->
+                <a class="btn btn-primary multiple disabled" onclick="kongAll()" shiro:hasPermission="system:order:kong">
+                    <i class="fa fa-remove"></i> 控单
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:order:export">
+                    <i class="fa fa-download"></i> 导出
+                 </a>
+                 <p>
+                 	<input type="text" readonly="readonly" disabled="disabled" id="totalPloss">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="totalNum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="userNum">
+                 	<input type="text" readonly="readonly" disabled="disabled" id="totalFee">
+                 </p>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: layout-latest-js" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:order:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:order:remove')}]];
+        var kongFlag = [[${@permission.hasPermi('system:order:kong')}]];
+        var prefix = ctx + "system/order";
+        
+        
+        function init(){
+        	total();
+        	$.table.search()
+        }
+        
+        function reset(){
+        	$.form.reset();
+        	total();
+        }
+        
+        function total(){
+        	var config = {
+       	        url: prefix + "/listTotal",
+       	        type: "post",
+       	        dataType: "json",
+       	        data: $('#formId').serialize(),
+       	        success: function(result) {
+       	        	if(result.data){
+       	        		$("#totalPloss").val("盈亏统计："+result.data.totalPloss.toFixed(2))
+       	        		$("#totalNum").val("交易笔数："+result.data.totalNum)
+       	        		$("#userNum").val("交易人数："+result.data.userNum)
+       	        		$("#totalFee").val("委托金额："+result.data.totalFee.toFixed(2))
+       	        	}else{
+       	        		$("#totalPloss").val("盈亏统计：0")
+       	        		$("#totalNum").val("交易人数：0")
+       	        		$("#userNum").val("交易笔数：0")
+       	        		$("#totalFee").val("委托金额：0")
+       	        	}
+       	        }
+       	    };
+       	    $.ajax(config)
+        }
+
+        $(function() {
+            total();
+            list();
+        });
+		function list(){
+            var options = {
+                url: prefix + "/list",
+                showColumns:false,
+                showSearch:true,
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "订单模块",
+                sortName: "oid",
+		        sortOrder: "desc",
+		        showPageGo: true,
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'oid', 
+                    title : '订单ID',
+                    visible: false
+                },
+                {
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                 	    return $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field : 'utel', 
+                    title : '用户'
+                },
+                {
+                    field : 'toputel', 
+                    title : '销售'
+                },
+                {
+                    field : 'ostyle', 
+                    title : '方向',
+                    formatter: function(value, row, index) {
+                    	if(value == 0){
+                    		return "涨";
+                    	}else if(value == 1){
+                    		return "跌";
+                    	}
+                    }
+                },
+                {
+                    field : 'endprofit', 
+                    title : '点数/分钟数',
+                    formatter: function(value, row, index) {
+                   		return value + "秒";
+                    }
+                },
+                {
+                    field : 'ptitle', 
+                    title : '商品名称'
+                },
+                {
+                    field : 'buytime', 
+                    title : '建仓时间',
+                    formatter: function(value,row,index){
+                    	return $.common.formatDate(value);
+                    }
+                },
+                {
+                    field : 'ostaus', 
+                    title : '状态',
+                    formatter: function(value, row, index) {
+                    	if(value == 0){
+                    		return "建仓";
+                    	}else if(value == 1){
+                    		return "平仓";
+                    	}
+                    }
+                },
+                {
+                    field : 'buyprice', 
+                    title : '入仓价'
+                },
+                {
+                    field : 'sellprice', 
+                    title : '平仓价'
+                },
+                {
+                    field : 'fee', 
+                    title : '总费用'
+                },
+                {
+                    field : 'commission', 
+                    title : '买后余额'
+                },
+                {
+                    field : 'ploss', 
+                    title : '盈亏'
+                },
+                {
+                    field : 'isWin', 
+                    title : '是否盈利1盈利2亏损3无效',
+                    visible: false,
+                    formatter: function(value, row, index) {
+                    	if(value == 1){
+                    		return "盈利";
+                    	}else if(value == 2){
+                    		return "亏损";
+                    	}else if(value == 3){
+                    		return "无效";
+                    	}
+                    }
+                },
+                {
+                    field : 'sxFee', 
+                    title : '手续费',
+                    visible: false
+                },
+                {
+                    field : 'kongType', 
+                    title : '指定',
+                    formatter: function(value, row, index) {
+                    	if(value == 0){
+                    		return "无";
+                    	}else if(value == 1){
+                    		return "赢";
+                    	}else if(value == 2){
+                    		return "亏";
+                    	}
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.oid + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        if(row.canKong == 1 && row.ostaus != 1){
+                        	actions.push('<a class="btn btn-success btn-xs ' + kongFlag + '" href="javascript:void(0)" onclick="kong(\'' + row.oid + '\')"><i class="fa fa-edit"></i>控单</a> ');
+                        }
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.oid + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        }
+        function kong(id){
+//         	1盈利2亏损
+        	var _html = `<select id="kong_type" style="width: 150px;height: 30px;">`;
+       		_html += '<option value="1">盈利</option>';
+       		_html += '<option value="2">亏损</option>';
+        	_html += `</select>`;
+					
+        	layer.confirm(_html, {
+    	        icon: 3,
+    	        title: "控单",
+    	        btn: ['提交', '取消']
+    	    }, function (index) {
+    	    	var param = {
+    					"oids" : id,
+    					"kong_type" : $("#kong_type").val()
+    			}
+    			$.post(prefix + "/kong", param, function(result) {
+    				if (result.code == 0) {
+    					$.modal.msgSuccess("Success");
+    					$.table.refresh();
+                    } else {
+    					$.modal.alertError(result.msg);
+    				}
+    				$.modal.closeLoading();
+    			});
+    	    }, function (index) {
+    	    });
+        }
+        
+        function kongAll() {
+    		var rows = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+    		console.log(rows)
+    		if (rows.length == 0) {
+    			$.modal.alertWarning("请至少选择一条记录");
+    			return;
+    		}
+    		kong(rows.join());
+//     		$.modal.confirm("确认要删除选中的" + rows.length + "条数据吗?", function() {
+//     			var url = $.table._option.removeUrl;
+//     			var data = { "ids": rows.join() };
+//     			$.operate.submit(url, "post", "json", data);
+//     		});
+        }
+    </script>
+</body>
+</html>

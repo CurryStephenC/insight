@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改理财记录')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-financialrecord-edit" th:object="${wpFinancialRecord}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">理财产品类型：</label>
+                <div class="col-sm-8">
+                    <select name="typeid" class="form-control m-b" required>
+                        <option value="">所有</option>
+                    </select>
+                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户：</label>
+                <div class="col-sm-8">
+                    <input name="uid" th:field="*{uid}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">利率：</label>
+                <div class="col-sm-8">
+                    <input name="rete" th:field="*{rete}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">购买金额：</label>
+                <div class="col-sm-8">
+                    <input name="buymoney" th:field="*{buymoney}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">赠送金额：</label>
+                <div class="col-sm-8">
+                    <input name="creditmoney" th:field="*{creditmoney}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">利润：</label>
+                <div class="col-sm-8">
+                    <input name="profit" th:field="*{profit}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">本金利润和：</label>
+                <div class="col-sm-8">
+                    <input name="totalmoney" th:field="*{totalmoney}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">开始计息时间：</label>
+                <div class="col-sm-8">
+                    <input name="begintime" th:field="*{begintime}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">结束计息时间：</label>
+                <div class="col-sm-8">
+                    <input name="endtime" th:field="*{endtime}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">可操作下一步时间：</label>
+                <div class="col-sm-8">
+                    <input name="returntime" th:field="*{returntime}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">冻结天数：</label>
+                <div class="col-sm-8">
+                    <input name="freezedate" th:field="*{freezedate}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">签到天数：</label>
+                <div class="col-sm-8">
+                    <input name="onboarddate" th:field="*{onboarddate}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">一级计息天数：</label>
+                <div class="col-sm-8">
+                    <input name="datep1" th:field="*{datep1}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">二级计息天数：</label>
+                <div class="col-sm-8">
+                    <input name="datep2" th:field="*{datep2}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">状态：0、收益中，1、已赎回：</label>
+                <div class="col-sm-8">
+                    <select name="status" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_record_status')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{status}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">下一个步骤：0、到期继续，1、到期赎回：</label>
+                <div class="col-sm-8">
+                    <select name="nextstep" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_nextstep')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{nextstep}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">来源ID(到期继续时有)：</label>
+                <div class="col-sm-8">
+                    <input name="pid" th:field="*{pid}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">第几个月：</label>
+                <div class="col-sm-8">
+                    <input name="month" th:field="*{month}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">类型：</label>
+                <div class="col-sm-8">
+                    <select name="type" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_type')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{type}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">手动赎回时间：</label>
+                <div class="col-sm-8">
+                    <input name="manualtime" th:field="*{manualtime}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">是否赠送：</label>
+                <div class="col-sm-8">
+                    <select name="isgive" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_isgive')}" required>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{isgive}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户手动赎回：1、否，2、赎回中，3、已赎回：</label>
+                <div class="col-sm-8">
+                    <select name="overself" class="form-control m-b" th:with="type=${@dict.getType('wp_financial_overself')}" required>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{overself}"></option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/financialrecord";
+        $("#form-financialrecord-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-financialrecord-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysAdvertMapper">
+    
+    <resultMap type="SysAdvert" id="SysAdvertResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="title"    column="title"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="detailurl"    column="detailurl"    />
+        <result property="adstatus"    column="adstatus"    />
+        <result property="desction"    column="desction"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="deptname"    column="dept_name"    />
+    </resultMap>
+
+    <sql id="selectSysAdvertVo">
+        SELECT t.id, t.dept_id, t.title, t.picurl, t.detailurl, t.adstatus, t.desction, t.create_time ,td.`dept_name` 
+		FROM sys_advert t
+		LEFT JOIN `sys_dept` td ON t.`dept_id` = td.`dept_id`
+    </sql>
+
+    <select id="selectSysAdvertList" parameterType="SysAdvert" resultMap="SysAdvertResult">
+        <include refid="selectSysAdvertVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and t.title like concat('%', #{title}, '%')</if>
+            <if test="adstatus != null "> and t.adstatus = #{adstatus}</if>
+            <if test="deptId != null and deptId != 0">
+				AND (t.dept_id = #{deptId} OR t.dept_id IN ( SELECT m.dept_id FROM sys_dept m WHERE FIND_IN_SET (#{deptId},ancestors) ))
+			</if>
+			<if test="deptIdUp != null and deptIdUp != 0">
+				AND FIND_IN_SET(t.`dept_id`,`getParentDeptList`(#{deptIdUp}))
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectSysAdvertById" parameterType="Long" resultMap="SysAdvertResult">
+        <include refid="selectSysAdvertVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertSysAdvert" parameterType="SysAdvert" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_advert
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null ">dept_id,</if>
+            <if test="title != null  and title != ''">title,</if>
+            <if test="picurl != null  and picurl != ''">picurl,</if>
+            <if test="detailurl != null  and detailurl != ''">detailurl,</if>
+            <if test="adstatus != null ">adstatus,</if>
+            <if test="desction != null  and desction != ''">desction,</if>
+            <if test="createTime != null ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null ">#{deptId},</if>
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="picurl != null  and picurl != ''">#{picurl},</if>
+            <if test="detailurl != null  and detailurl != ''">#{detailurl},</if>
+            <if test="adstatus != null ">#{adstatus},</if>
+            <if test="desction != null  and desction != ''">#{desction},</if>
+            <if test="createTime != null ">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysAdvert" parameterType="SysAdvert">
+        update sys_advert
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null ">dept_id = #{deptId},</if>
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="picurl != null  and picurl != ''">picurl = #{picurl},</if>
+            <if test="detailurl != null  and detailurl != ''">detailurl = #{detailurl},</if>
+            <if test="adstatus != null ">adstatus = #{adstatus},</if>
+            <if test="desction != null  and desction != ''">desction = #{desction},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysAdvertById" parameterType="Long">
+        delete from sys_advert where id = #{id}
+    </delete>
+
+    <delete id="deleteSysAdvertByIds" parameterType="String">
+        delete from sys_advert where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

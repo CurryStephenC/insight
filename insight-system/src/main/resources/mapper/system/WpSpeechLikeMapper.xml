@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpSpeechLikeMapper">
+    
+    <resultMap type="WpSpeechLike" id="WpSpeechLikeResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="refid"    column="refid"    />
+        <result property="type"    column="type"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpSpeechLikeVo">
+        select t.id, t.uid, t.refid, t.type, t.createtime from wp_speech_like t
+    </sql>
+
+    <select id="selectWpSpeechLikeList" parameterType="WpSpeechLike" resultMap="WpSpeechLikeResult">
+        <include refid="selectWpSpeechLikeVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="refid != null "> and t.`refid` = #{refid}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="createtime != null "> and t.`createtime` = #{createtime}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpSpeechLikeById" parameterType="Integer" resultMap="WpSpeechLikeResult">
+        <include refid="selectWpSpeechLikeVo"/>
+        where t.id = #{id}
+    </select>
+    
+    <select id="selectUserLike" parameterType="WpSpeechLike" resultMap="WpSpeechLikeResult">
+        <include refid="selectWpSpeechLikeVo"/>
+        where t.uid = #{uid} and t.refid = #{refid} and t.type = #{type}
+    </select>
+        
+    <insert id="insertWpSpeechLike" parameterType="WpSpeechLike" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_speech_like
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="refid != null ">`refid`,</if>
+            <if test="type != null ">`type`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="refid != null ">#{refid},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="createtime != null ">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpSpeechLike" parameterType="WpSpeechLike">
+        update wp_speech_like
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="refid != null ">`refid` = #{refid},</if>
+            <if test="type != null ">`type` = #{type},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpSpeechLikeById" parameterType="Integer">
+        delete from wp_speech_like where id = #{id}
+    </delete>
+
+    <delete id="deleteWpSpeechLikeByIds" parameterType="String">
+        delete from wp_speech_like where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

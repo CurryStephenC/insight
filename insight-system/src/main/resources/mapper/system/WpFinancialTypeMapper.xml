@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpFinancialTypeMapper">
+    
+    <resultMap type="WpFinancialType" id="WpFinancialTypeResult">
+        <result property="id"    column="id"    />
+        <result property="isnormal"    column="isnormal"    />
+        <result property="name"    column="name"    />
+        <result property="rete"    column="rete"    />
+        <result property="minbuymoney"    column="minbuymoney"    />
+        <result property="maxbuymoney"    column="maxbuymoney"    />
+        <result property="rebate"    column="rebate"    />
+        <result property="freezedate"    column="freezedate"    />
+        <result property="ishot"    column="ishot"    />
+        <result property="redpercent"    column="redpercent"    />
+        <result property="canover"    column="canover"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="type"    column="type"    />
+        <result property="status"    column="status"    />
+        <result property="feerate"    column="feerate"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="orderby"    column="orderby"    />
+    </resultMap>
+    
+    <resultMap type="FinancialTypeResp" id="FinancialTypeResult">
+        <result property="id"    column="id"    />
+        <result property="isnormal"    column="isnormal"    />
+        <result property="name"    column="name"    />
+        <result property="rete"    column="rete"    />
+        <result property="minbuymoney"    column="minbuymoney"    />
+        <result property="maxbuymoney"    column="maxbuymoney"    />
+        <result property="freezedate"    column="freezedate"    />
+        <result property="ishot"    column="ishot"    />
+        <result property="redpercent"    column="redpercent"    />
+        <result property="canover"    column="canover"    />
+        <result property="picurl"    column="picurl"    />
+        <result property="type"    column="type"    />
+        <result property="status"    column="status"    />
+        <result property="remark"    column="remark"    />
+        <result property="rebate"    column="rebate"    />
+        <collection property="detail" column="id" select="com.wjyoption.system.mapper.WpFinancialTypeDetailMapper.selectDetailVo"/>
+    </resultMap>
+
+    <sql id="selectWpFinancialTypeVo">
+        select t.* 
+        from wp_financial_type t
+    </sql>
+
+    <select id="selectWpFinancialTypeList" parameterType="WpFinancialType" resultMap="WpFinancialTypeResult">
+        <include refid="selectWpFinancialTypeVo"/>
+        <where>  
+            <if test="isnormal != null "> and t.`isnormal` = #{isnormal}</if>
+            <if test="name != null  and name != ''"> and t.`name` like concat('%', #{name}, '%')</if>
+            <if test="canover != null "> and t.`canover` = #{canover}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectFinancialTypeResp" parameterType="FinancialTypeResp" resultMap="FinancialTypeResult">
+        <include refid="selectWpFinancialTypeVo"/>
+        <where>  
+            <if test="isnormal != null "> and t.`isnormal` = #{isnormal}</if>
+            <if test="name != null  and name != ''"> and t.`name` like concat('%', #{name}, '%')</if>
+            <if test="ishot != null "> and t.`ishot` = #{ishot}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpFinancialTypeById" parameterType="Integer" resultMap="WpFinancialTypeResult">
+        <include refid="selectWpFinancialTypeVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpFinancialType" parameterType="WpFinancialType" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_financial_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="isnormal != null ">`isnormal`,</if>
+            <if test="name != null  and name != ''">`name`,</if>
+            <if test="picurl != null  and picurl != ''">`picurl`,</if>
+            <if test="remark != null  and remark != ''">`remark`,</if>
+            <if test="rete != null ">`rete`,</if>
+            <if test="minbuymoney != null ">`minbuymoney`,</if>
+            <if test="maxbuymoney != null ">`maxbuymoney`,</if>
+            <if test="rebate != null ">`rebate`,</if>
+            <if test="freezedate != null ">`freezedate`,</if>
+            <if test="ishot != null ">`ishot`,</if>
+            <if test="redpercent != null ">`redpercent`,</if>
+            <if test="canover != null ">`canover`,</if>
+            <if test="type != null ">`type`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+            <if test="orderby != null ">`orderby`,</if>
+            <if test="feerate != null ">`feerate`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="isnormal != null ">#{isnormal},</if>
+            <if test="name != null  and name != ''">#{name},</if>
+            <if test="picurl != null  and picurl != ''">#{picurl},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="rete != null ">#{rete},</if>
+            <if test="minbuymoney != null ">#{minbuymoney},</if>
+            <if test="maxbuymoney != null ">#{maxbuymoney},</if>
+            <if test="rebate != null ">#{rebate},</if>
+            <if test="freezedate != null ">#{freezedate},</if>
+            <if test="ishot != null ">#{ishot},</if>
+            <if test="redpercent != null ">#{redpercent},</if>
+            <if test="canover != null ">#{canover},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="createtime != null ">#{createtime},</if>
+            <if test="orderby != null ">#{orderby},</if>
+            <if test="feerate != null ">#{feerate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpFinancialType" parameterType="WpFinancialType">
+        update wp_financial_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="isnormal != null ">`isnormal` = #{isnormal},</if>
+            <if test="name != null  and name != ''">`name` = #{name},</if>
+            <if test="picurl != null  and picurl != ''">`picurl` = #{picurl},</if>
+            <if test="remark != null  and remark != ''">`remark` = #{remark},</if>
+            <if test="rete != null ">`rete` = #{rete},</if>
+            <if test="minbuymoney != null ">`minbuymoney` = #{minbuymoney},</if>
+            <if test="maxbuymoney != null ">`maxbuymoney` = #{maxbuymoney},</if>
+            <if test="rebate != null ">`rebate` = #{rebate},</if>
+            <if test="freezedate != null ">`freezedate` = #{freezedate},</if>
+            <if test="ishot != null ">`ishot` = #{ishot},</if>
+            <if test="redpercent != null ">`redpercent` = #{redpercent},</if>
+            <if test="canover != null ">`canover` = #{canover},</if>
+            <if test="type != null ">`type` = #{type},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="feerate != null ">`feerate` = #{feerate},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+            <if test="orderby != null ">`orderby` = #{orderby},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpFinancialTypeById" parameterType="Integer">
+        delete from wp_financial_type where id = #{id}
+    </delete>
+
+    <delete id="deleteWpFinancialTypeByIds" parameterType="String">
+        delete from wp_financial_type where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

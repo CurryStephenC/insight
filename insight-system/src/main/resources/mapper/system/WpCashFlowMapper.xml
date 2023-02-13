@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpCashFlowMapper">
+    
+    <resultMap type="WpCashFlow" id="WpCashFlowResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="type"    column="type"    />
+        <result property="money"    column="money"    />
+        <result property="content"    column="content"    />
+        <result property="time"    column="time"    />
+        <result property="nowmoney"    column="nowmoney"    />
+        <result property="utel"    column="utel"    />
+        <result property="putel"    column="putel"    />
+        <result property="toputel"    column="toputel"    />
+        <result property="name"    column="name"    />
+        <result property="name_en"    column="name_en"    />
+    </resultMap>
+
+    <sql id="selectWpCashFlowVo">
+        select t.id, t.uid, t.type, t.money, t.content, t.time, t.nowmoney,u.utel,p.utel putel,top2.utel toputel,tt.name_en,tt.name 
+        from wp_cash_flow t
+        left join wp_cash_flow_type tt on t.type=tt.id
+        left join wp_userinfo u on t.uid = u.uid
+        left join wp_userinfo p on p.uid=u.oid
+        left join wp_userinfo top2 on top2.uid=u.topid
+    </sql>
+
+    <select id="selectWpCashFlowList" parameterType="WpCashFlow" resultMap="WpCashFlowResult">
+        <include refid="selectWpCashFlowVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="utel != null and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="putel != null and putel != ''"> and p.`utel` = #{putel}</if>
+            <if test="toputel != null and toputel != ''"> and top2.`utel` = #{toputel}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND from_unixtime(t.`time`,'%Y%m%d') &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND from_unixtime(t.`time`,'%Y%m%d') &lt;= #{params.endTime}
+			</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectTotalMoney" parameterType="WpCashFlow" resultType="String">
+        select sum(t.money) 
+        from wp_cash_flow t
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="beginTime != null "> and t.`time` <![CDATA[ >= ]]> #{beginTime}</if>
+            <if test="endTime != null "> and t.`time` <![CDATA[ <= ]]> #{endTime}</if>
+            <if test="types != null ">
+            	and t.`type` in
+            	<foreach item="id" collection="types" open="(" separator="," close=")">
+		            #{id}
+		        </foreach> 
+            </if>
+        </where>
+    </select>
+    <select id="selectCashFlowList" parameterType="CashFlowResp" resultType="CashFlowResp">
+        select t.type, t.money,t.time, t.nowmoney,u.utel,tt.name_en
+        from wp_cash_flow t
+        left join wp_cash_flow_type tt on t.type=tt.id
+        left join wp_userinfo u on t.uid = u.uid
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="oid != null "> and u.`oid` = #{oid}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="noType != null ">
+            	and t.`type` not in
+            	<foreach item="id" collection="noType" open="(" separator="," close=")">
+		            #{id}
+		        </foreach> 
+            </if>
+            <if test="types != null ">
+            	and t.`type` in
+            	<foreach item="id" collection="types" open="(" separator="," close=")">
+		            #{id}
+		        </foreach> 
+            </if>
+            
+        </where>
+    </select>
+    
+    <select id="selectWpCashFlowById" parameterType="Integer" resultMap="WpCashFlowResult">
+        <include refid="selectWpCashFlowVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpCashFlow" parameterType="WpCashFlow" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_cash_flow
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="type != null ">`type`,</if>
+            <if test="money != null  and money != ''">`money`,</if>
+            <if test="content != null  and content != ''">`content`,</if>
+            <if test="time != null">`time`,</if>
+            <if test="nowmoney != null  and nowmoney != ''">`nowmoney`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="money != null  and money != ''">#{money},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="time != null">#{time},</if>
+            <if test="nowmoney != null  and nowmoney != ''">#{nowmoney},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpCashFlow" parameterType="WpCashFlow">
+        update wp_cash_flow
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="type != null ">`type` = #{type},</if>
+            <if test="money != null  and money != ''">`money` = #{money},</if>
+            <if test="content != null  and content != ''">`content` = #{content},</if>
+            <if test="time != null ">`time` = #{time},</if>
+            <if test="nowmoney != null  and nowmoney != ''">`nowmoney` = #{nowmoney},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpCashFlowById" parameterType="Integer">
+        delete from wp_cash_flow where id = #{id}
+    </delete>
+
+    <delete id="deleteWpCashFlowByIds" parameterType="String">
+        delete from wp_cash_flow where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

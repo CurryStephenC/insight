@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpFinancialBuyMapper">
+    
+    <resultMap type="WpFinancialBuy" id="WpFinancialBuyResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="detailid"    column="detailid"    />
+        <result property="pid"    column="pid"    />
+        <result property="ptitle"    column="ptitle"    />
+        <result property="direct"    column="direct"    />
+        <result property="profit"    column="profit"    />
+        <result property="rate"    column="rate"    />
+        <result property="daily"    column="daily"    />
+    </resultMap>
+
+    <sql id="selectWpFinancialBuyVo">
+        select t.id, t.uid, t.detailid, t.pid, t.ptitle, t.direct, t.profit, t.rate, t.daily from wp_teacher_buy t
+    </sql>
+
+    <select id="selectWpFinancialBuyList" parameterType="WpFinancialBuy" resultMap="WpFinancialBuyResult">
+        <include refid="selectWpFinancialBuyVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="detailid != null "> and t.`detailid` = #{detailid}</if>
+            <if test="pid != null "> and t.`pid` = #{pid}</if>
+            <if test="ptitle != null  and ptitle != ''"> and t.`ptitle` = #{ptitle}</if>
+            <if test="direct != null "> and t.`direct` = #{direct}</if>
+            <if test="profit != null "> and t.`profit` = #{profit}</if>
+            <if test="rate != null "> and t.`rate` = #{rate}</if>
+            <if test="daily != null "> and t.`daily` = #{daily}</if>
+        </where>
+    </select>
+    <select id="selectFinancialBuyList" parameterType="Integer" resultType="FinancialBuyResp">
+        select t.id, t.detailid, t.ptitle, t.direct, t.profit, t.rate, t.daily 
+        from wp_teacher_buy t
+        where t.`detailid` = #{detailid}
+    </select>
+    
+    <select id="selectWpFinancialBuyById" parameterType="Integer" resultMap="WpFinancialBuyResult">
+        <include refid="selectWpFinancialBuyVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpFinancialBuy" parameterType="WpFinancialBuy" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_teacher_buy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="detailid != null ">`detailid`,</if>
+            <if test="pid != null ">`pid`,</if>
+            <if test="ptitle != null  and ptitle != ''">`ptitle`,</if>
+            <if test="direct != null ">`direct`,</if>
+            <if test="profit != null ">`profit`,</if>
+            <if test="rate != null ">`rate`,</if>
+            <if test="daily != null ">`daily`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="detailid != null ">#{detailid},</if>
+            <if test="pid != null ">#{pid},</if>
+            <if test="ptitle != null  and ptitle != ''">#{ptitle},</if>
+            <if test="direct != null ">#{direct},</if>
+            <if test="profit != null ">#{profit},</if>
+            <if test="rate != null ">#{rate},</if>
+            <if test="daily != null ">#{daily},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpFinancialBuy" parameterType="WpFinancialBuy">
+        update wp_teacher_buy
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="detailid != null ">`detailid` = #{detailid},</if>
+            <if test="pid != null ">`pid` = #{pid},</if>
+            <if test="ptitle != null  and ptitle != ''">`ptitle` = #{ptitle},</if>
+            <if test="direct != null ">`direct` = #{direct},</if>
+            <if test="profit != null ">`profit` = #{profit},</if>
+            <if test="rate != null ">`rate` = #{rate},</if>
+            <if test="daily != null ">`daily` = #{daily},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpFinancialBuyById" parameterType="Integer">
+        delete from wp_teacher_buy where id = #{id}
+    </delete>
+
+    <delete id="deleteWpFinancialBuyByIds" parameterType="String">
+        delete from wp_teacher_buy where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

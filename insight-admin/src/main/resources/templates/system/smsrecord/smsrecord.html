@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('短信发送记录列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>电话号码：</p>
+                                <input type="text" name="phonenum"/>
+                            </li>
+                            <li>
+                                <p>来源：</p>
+                                <input type="text" name="source"/>
+                            </li>
+                            <li>
+                                <p>发送状态：</p>
+                                <select name="sendstate" th:with="type=${@dict.getType('sys_sms_sendstate')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>短信类型：</p>
+                                <select name="smstype" th:with="type=${@dict.getType('sys_sms_type')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>创建时间：</p>
+                                <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:smsrecord:export">
+                    <i class="fa fa-download"></i> 导出
+                 </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var sendstateDatas = [[${@dict.getType('sys_sms_sendstate')}]];
+        var smstypeDatas = [[${@dict.getType('sys_sms_type')}]];
+        var prefix = ctx + "system/smsrecord";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                showColumns:false,
+                showSearch:true,
+                exportUrl: prefix + "/export",
+                modalName: "短信发送记录",
+                sortName: "id",
+		        sortOrder: "desc",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'id', 
+                    title : '主键ID',
+                    visible: false
+                },
+                {
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                 	    return $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field : 'source', 
+                    title : '来源'
+                },
+                {
+                    field : 'content', 
+                    title : '短信内容',
+                    width : 550
+                },
+                {
+                    field : 'phonenum', 
+                    title : '电话号码'
+                },
+                {
+                    field : 'channel', 
+                    title : '短信通道'
+                },
+                {
+                    field : 'resultdata', 
+                    title : '返回数据'
+                },
+                {
+                    field : 'sendstate', 
+                    title : '发送状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(sendstateDatas, value);
+                    }
+                },
+                {
+                    field : 'smstype', 
+                    title : '短信类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(smstypeDatas, value);
+                    }
+                },
+                {
+                    field : 'createTime', 
+                    title : '创建时间'
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpProductinfoMapper">
+    
+    <resultMap type="WpProductinfo" id="WpProductinfoResult">
+        <result property="pid"    column="pid"    />
+        <result property="ptitle"    column="ptitle"    />
+        <result property="cid"    column="cid"    />
+        <result property="otid"    column="otid"    />
+        <result property="isopen"    column="isopen"    />
+        <result property="pointLow"    column="point_low"    />
+        <result property="pointTop"    column="point_top"    />
+        <result property="rands"    column="rands"    />
+        <result property="content"    column="content"    />
+        <result property="time"    column="time"    />
+        <result property="isdelete"    column="isdelete"    />
+        <result property="procode"    column="procode"    />
+        <result property="addData"    column="add_data"    />
+        <result property="protime"    column="protime"    />
+        <result property="propoint"    column="propoint"    />
+        <result property="proscale"    column="proscale"    />
+        <result property="proorder"    column="proorder"    />
+        <result property="opentime"    column="opentime"    />
+        <result property="icon"    column="icon"    />
+    </resultMap>
+
+    <sql id="selectWpProductinfoVo">
+        select t.pid, t.ptitle, t.cid, t.otid, t.isopen, t.point_low, t.point_top, t.rands, t.content,t.icon, 
+        t.time, t.isdelete, t.procode, t.add_data, t.protime, t.propoint, t.proscale, t.proorder,t.opentime 
+        from wp_productinfo t
+    </sql>
+
+    <select id="selectWpProductinfoList" parameterType="WpProductinfo" resultMap="WpProductinfoResult">
+        <include refid="selectWpProductinfoVo"/>
+        <where>  
+            <if test="ptitle != null  and ptitle != ''"> and t.`ptitle` = #{ptitle}</if>
+            <if test="isopen != null "> and t.`isopen` = #{isopen}</if>
+            <if test="isdelete != null "> and t.`isdelete` = #{isdelete}</if>
+            <if test="procode != null  and procode != ''"> and t.`procode` = #{procode}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpProductinfoById" parameterType="Integer" resultMap="WpProductinfoResult">
+        <include refid="selectWpProductinfoVo"/>
+        where t.pid = #{pid}
+    </select>
+    <select id="queryAllProduct" resultType="ProductResp">
+    	SELECT t.`pid`,t.`ptitle`,pd.`Price` price,pd.`UpdateTime` updatetime,pd.`Low` low,pd.`High` high
+    		,t.protime, t.proscale,t.icon,t.opentime,t.isopen
+		FROM `wp_productinfo` t
+		LEFT JOIN `wp_productdata` pd ON t.`pid`=pd.`pid`
+		WHERE t.isdelete = 0
+    </select>
+        
+    <insert id="insertWpProductinfo" parameterType="WpProductinfo" useGeneratedKeys="true" keyProperty="pid">
+        insert into wp_productinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ptitle != null  and ptitle != ''">`ptitle`,</if>
+            <if test="cid != null ">`cid`,</if>
+            <if test="otid != null ">`otid`,</if>
+            <if test="isopen != null ">`isopen`,</if>
+            <if test="pointLow != null  and pointLow != ''">`point_low`,</if>
+            <if test="pointTop != null  and pointTop != ''">`point_top`,</if>
+            <if test="rands != null  and rands != ''">`rands`,</if>
+            <if test="content != null  and content != ''">`content`,</if>
+            <if test="time != null ">`time`,</if>
+            <if test="isdelete != null ">`isdelete`,</if>
+            <if test="procode != null  and procode != ''">`procode`,</if>
+            <if test="addData != null ">`add_data`,</if>
+            <if test="protime != null  and protime != ''">`protime`,</if>
+            <if test="propoint != null  and propoint != ''">`propoint`,</if>
+            <if test="proscale != null  and proscale != ''">`proscale`,</if>
+            <if test="opentime != null  and opentime != ''">`opentime`,</if>
+            <if test="icon != null  and icon != ''">`icon`,</if>
+            <if test="proorder != null ">`proorder`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ptitle != null  and ptitle != ''">#{ptitle},</if>
+            <if test="cid != null ">#{cid},</if>
+            <if test="otid != null ">#{otid},</if>
+            <if test="isopen != null ">#{isopen},</if>
+            <if test="pointLow != null  and pointLow != ''">#{pointLow},</if>
+            <if test="pointTop != null  and pointTop != ''">#{pointTop},</if>
+            <if test="rands != null  and rands != ''">#{rands},</if>
+            <if test="content != null  and content != ''">#{content},</if>
+            <if test="time != null ">#{time},</if>
+            <if test="isdelete != null ">#{isdelete},</if>
+            <if test="procode != null  and procode != ''">#{procode},</if>
+            <if test="addData != null ">#{addData},</if>
+            <if test="protime != null  and protime != ''">#{protime},</if>
+            <if test="propoint != null  and propoint != ''">#{propoint},</if>
+            <if test="proscale != null  and proscale != ''">#{proscale},</if>
+            <if test="opentime != null  and opentime != ''">#{opentime},</if>
+            <if test="icon != null  and icon != ''">#{icon},</if>
+            <if test="proorder != null ">#{proorder},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpProductinfo" parameterType="WpProductinfo">
+        update wp_productinfo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ptitle != null  and ptitle != ''">`ptitle` = #{ptitle},</if>
+            <if test="cid != null ">`cid` = #{cid},</if>
+            <if test="otid != null ">`otid` = #{otid},</if>
+            <if test="isopen != null ">`isopen` = #{isopen},</if>
+            <if test="pointLow != null  and pointLow != ''">`point_low` = #{pointLow},</if>
+            <if test="pointTop != null  and pointTop != ''">`point_top` = #{pointTop},</if>
+            <if test="rands != null  and rands != ''">`rands` = #{rands},</if>
+            <if test="content != null  and content != ''">`content` = #{content},</if>
+            <if test="time != null ">`time` = #{time},</if>
+            <if test="isdelete != null ">`isdelete` = #{isdelete},</if>
+            <if test="procode != null  and procode != ''">`procode` = #{procode},</if>
+            <if test="addData != null ">`add_data` = #{addData},</if>
+            <if test="protime != null  and protime != ''">`protime` = #{protime},</if>
+            <if test="propoint != null  and propoint != ''">`propoint` = #{propoint},</if>
+            <if test="proscale != null  and proscale != ''">`proscale` = #{proscale},</if>
+            <if test="opentime != null  and opentime != ''">`opentime` = #{opentime},</if>
+            <if test="icon != null  and icon != ''">`icon` = #{icon},</if>
+            <if test="proorder != null ">`proorder` = #{proorder},</if>
+        </trim>
+        where pid = #{pid}
+    </update>
+
+    <delete id="deleteWpProductinfoById" parameterType="Long">
+        delete from wp_productinfo where pid = #{pid}
+    </delete>
+
+    <delete id="deleteWpProductinfoByIds" parameterType="String">
+        delete from wp_productinfo where pid in 
+        <foreach item="pid" collection="array" open="(" separator="," close=")">
+            #{pid}
+        </foreach>
+    </delete>
+    
+</mapper>

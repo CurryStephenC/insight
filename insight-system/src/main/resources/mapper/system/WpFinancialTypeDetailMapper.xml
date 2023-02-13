@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpFinancialTypeDetailMapper">
+    
+    <resultMap type="WpFinancialTypeDetail" id="WpFinancialTypeDetailResult">
+        <result property="id"    column="id"    />
+        <result property="typeid"    column="typeid"    />
+        <result property="dividend"    column="dividend"    />
+        <result property="agency"    column="agency"    />
+        <result property="riskmsg"    column="riskmsg"    />
+        <result property="repayment"    column="repayment"    />
+        <result property="settlementtime"    column="settlementtime"    />
+        <result property="custodianbank"    column="custodianbank"    />
+        <result property="security"    column="security"    />
+        <result property="referralreward"    column="referralreward"    />
+        <result property="jianguan"    column="jianguan"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="pdfurl"    column="pdfurl"    />
+    </resultMap>
+
+    <sql id="selectWpFinancialTypeDetailVo">
+        select t.id, t.typeid, t.dividend, t.agency, t.riskmsg, t.repayment, t.settlementtime, t.custodianbank, t.security, 
+        	t.referralreward,t.jianguan, t.remark, t.create_time, t.update_time,t.pdfurl 
+        from wp_financial_type_detail t
+    </sql>
+
+    <select id="selectWpFinancialTypeDetailList" parameterType="WpFinancialTypeDetail" resultMap="WpFinancialTypeDetailResult">
+        <include refid="selectWpFinancialTypeDetailVo"/>
+        <where>  
+            <if test="typeid != null "> and t.`typeid` = #{typeid}</if>
+        </where>
+    </select>
+    
+    <select id="selectWpFinancialTypeDetailById" parameterType="Integer" resultMap="WpFinancialTypeDetailResult">
+        <include refid="selectWpFinancialTypeDetailVo"/>
+        where t.id = #{id}
+    </select>
+    <select id="selectDetailBytypeId" parameterType="Integer" resultMap="WpFinancialTypeDetailResult">
+        <include refid="selectWpFinancialTypeDetailVo"/>
+        where t.typeid = #{typeid}
+    </select>
+    
+    <select id="selectDetailVo" parameterType="Integer" resultType="com.wjyoption.system.vo.resp.FinancialTypeDetailVo">
+        select t.typeid, t.dividend, t.agency, t.riskmsg, t.repayment, t.settlementtime, t.custodianbank, t.security, t.referralreward,t.jianguan, t.remark,t.pdfurl 
+        from wp_financial_type_detail t
+        where t.typeid = #{typeid}
+    </select>
+        
+    <insert id="insertWpFinancialTypeDetail" parameterType="WpFinancialTypeDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_financial_type_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="typeid != null ">`typeid`,</if>
+            <if test="dividend != null  and dividend != ''">`dividend`,</if>
+            <if test="agency != null  and agency != ''">`agency`,</if>
+            <if test="riskmsg != null  and riskmsg != ''">`riskmsg`,</if>
+            <if test="repayment != null  and repayment != ''">`repayment`,</if>
+            <if test="settlementtime != null  and settlementtime != ''">`settlementtime`,</if>
+            <if test="custodianbank != null  and custodianbank != ''">`custodianbank`,</if>
+            <if test="security != null  and security != ''">`security`,</if>
+            <if test="referralreward != null  and referralreward != ''">`referralreward`,</if>
+            <if test="remark != null  and remark != ''">`remark`,</if>
+            <if test="jianguan != null  and jianguan != ''">`jianguan`,</if>
+            <if test="pdfurl != null  and pdfurl != ''">`pdfurl`,</if>
+            <if test="createTime != null ">`create_time`,</if>
+            <if test="updateTime != null ">`update_time`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="typeid != null ">#{typeid},</if>
+            <if test="dividend != null  and dividend != ''">#{dividend},</if>
+            <if test="agency != null  and agency != ''">#{agency},</if>
+            <if test="riskmsg != null  and riskmsg != ''">#{riskmsg},</if>
+            <if test="repayment != null  and repayment != ''">#{repayment},</if>
+            <if test="settlementtime != null  and settlementtime != ''">#{settlementtime},</if>
+            <if test="custodianbank != null  and custodianbank != ''">#{custodianbank},</if>
+            <if test="security != null  and security != ''">#{security},</if>
+            <if test="referralreward != null  and referralreward != ''">#{referralreward},</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="jianguan != null  and jianguan != ''">#{jianguan},</if>
+            <if test="pdfurl != null  and pdfurl != ''">#{pdfurl},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpFinancialTypeDetail" parameterType="WpFinancialTypeDetail">
+        update wp_financial_type_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="typeid != null ">`typeid` = #{typeid},</if>
+            <if test="dividend != null  and dividend != ''">`dividend` = #{dividend},</if>
+            <if test="agency != null  and agency != ''">`agency` = #{agency},</if>
+            <if test="riskmsg != null  and riskmsg != ''">`riskmsg` = #{riskmsg},</if>
+            <if test="repayment != null  and repayment != ''">`repayment` = #{repayment},</if>
+            <if test="settlementtime != null  and settlementtime != ''">`settlementtime` = #{settlementtime},</if>
+            <if test="custodianbank != null  and custodianbank != ''">`custodianbank` = #{custodianbank},</if>
+            <if test="security != null  and security != ''">`security` = #{security},</if>
+            <if test="referralreward != null  and referralreward != ''">`referralreward` = #{referralreward},</if>
+            <if test="remark != null  and remark != ''">`remark` = #{remark},</if>
+            <if test="jianguan != null  and jianguan != ''">`jianguan` = #{jianguan},</if>
+            <if test="pdfurl != null  and pdfurl != ''">`pdfurl` = #{pdfurl},</if>
+            <if test="createTime != null ">`create_time` = #{createTime},</if>
+            <if test="updateTime != null ">`update_time` = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+</mapper>

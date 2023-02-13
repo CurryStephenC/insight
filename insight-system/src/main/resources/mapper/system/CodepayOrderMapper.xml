@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.CodepayOrderMapper">
+    
+    <resultMap type="CodepayOrder" id="CodepayOrderResult">
+        <result property="id"    column="id"    />
+        <result property="payId"    column="pay_id"    />
+        <result property="money"    column="money"    />
+        <result property="price"    column="price"    />
+        <result property="type"    column="type"    />
+        <result property="payNo"    column="pay_no"    />
+        <result property="param"    column="param"    />
+        <result property="payTime"    column="pay_time"    />
+        <result property="payTag"    column="pay_tag"    />
+        <result property="status"    column="status"    />
+        <result property="creatTime"    column="creat_time"    />
+        <result property="upTime"    column="up_time"    />
+        <result property="thirdid"    column="thirdid"    />
+        <result property="onlinepaytype"    column="onlinepaytype"    />
+        <result property="url"    column="url"    />
+        <result property="utel"    column="utel"    />
+        <result property="putel"    column="putel"    />
+        <result property="toputel"    column="toputel"    />
+        <result property="comenewtask"    column="comenewtask"    />
+        <result property="operatorid"    column="operatorid"    />
+    </resultMap>
+
+    <sql id="selectCodepayOrderVo">
+        select t.id, t.pay_id, t.money, t.price, t.type, t.pay_no, t.param, t.pay_time, t.pay_tag, t.status, t.creat_time, t.up_time, t.thirdid, 
+        t.comenewtask,t.onlinepaytype, t.url, t.operatorid,u.utel,p.utel putel,top2.utel toputel 
+        from codepay_order t
+        left join wp_userinfo u on t.pay_id=u.uid
+        left join wp_userinfo p on u.oid = p.uid
+        left join wp_userinfo top2 on top2.uid = u.topid
+    </sql>
+    
+    <sql id="listWhere">
+    	<where>  
+            <if test="payId != null "> and t.`pay_id` = #{payId}</if>
+            <if test="comenewtask != null "> and t.`comenewtask` = #{comenewtask}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="normaltype != null "> and u.`normaltype` = #{normaltype}</if>
+            <if test="money != null "> and t.`money` = #{money}</if>
+            <if test="price != null "> and t.`price` = #{price}</if>
+            <if test="payNo != null  and payNo != ''"> and t.`pay_no` = #{payNo}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="onlinepaytype != null "> and t.`onlinepaytype` = #{onlinepaytype}</if>
+            <if test="creatTime != null "> and t.`creat_time` = #{creatTime}</if>
+            <if test="upTime != null  and upTime != ''"> and t.`up_time` = #{upTime}</if>
+            <if test="thirdid != null  and thirdid != ''"> and t.`thirdid` = #{thirdid}</if>
+            <if test="utel != null  and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="putel != null  and putel != ''"> and p.`utel` = #{putel}</if>
+            <if test="toputel != null  and toputel != ''"> and top2.`utel` = #{toputel}</if>
+            <if test="payTag != null  and payTag != ''"> and t.`pay_tag` = #{payTag}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(t.`up_time`,'%Y%m%d') &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(t.`up_time`,'%Y%m%d') &lt;= #{params.endTime}
+			</if>
+			<if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+			<if test="payIds != null">
+				AND t.`pay_id` in 
+				<foreach item="uid" collection="payIds" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+        </where>
+    </sql>
+
+    <select id="selectCodepayOrderList" parameterType="CodepayOrder" resultMap="CodepayOrderResult">
+        <include refid="selectCodepayOrderVo"/>
+        <include refid="listWhere"/>
+    </select>
+    <select id="selectCodepayOrderTotal" parameterType="CodepayOrder" resultType="CodepayOrderTotal">
+        select sum(t.money) finishTotalMoney,count(DISTINCT t.pay_id) todayNum
+        from codepay_order t
+        left join wp_userinfo u on t.pay_id=u.uid
+        left join wp_userinfo p on u.oid = p.uid
+        left join wp_userinfo top2 on top2.uid = u.topid
+        <include refid="listWhere"/>
+    </select>
+    
+    <select id="selectCodepayOrderById" parameterType="Long" resultMap="CodepayOrderResult">
+        <include refid="selectCodepayOrderVo"/>
+        where t.id = #{id}
+    </select>
+    
+    <select id="selectCodepayOrderByOrderid" parameterType="String" resultMap="CodepayOrderResult">
+        <include refid="selectCodepayOrderVo"/>
+        where t.pay_no = #{pay_no}
+    </select>
+    <select id="selectCodepayOrderByThirdid" parameterType="String" resultMap="CodepayOrderResult">
+        <include refid="selectCodepayOrderVo"/>
+        where t.thirdid = #{thirdid}
+    </select>
+    <select id="selectTotalMoney" parameterType="Integer" resultType="java.math.BigDecimal">
+        select sum(money)
+		from codepay_order 
+        where status = 1 and pay_id = #{uid}
+    </select>
+        
+    <insert id="insertCodepayOrder" parameterType="CodepayOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into codepay_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="payId != null ">`pay_id`,</if>
+            <if test="money != null ">`money`,</if>
+            <if test="price != null ">`price`,</if>
+            <if test="type != null ">`type`,</if>
+            <if test="payNo != null  and payNo != ''">`pay_no`,</if>
+            <if test="param != null  and param != ''">`param`,</if>
+            <if test="payTime != null ">`pay_time`,</if>
+            <if test="payTag != null  and payTag != ''">`pay_tag`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="creatTime != null ">`creat_time`,</if>
+            <if test="upTime != null  and upTime != ''">`up_time`,</if>
+            <if test="thirdid != null  and thirdid != ''">`thirdid`,</if>
+            <if test="onlinepaytype != null ">`onlinepaytype`,</if>
+            <if test="url != null  and url != ''">`url`,</if>
+            <if test="operatorid != null ">`operatorid`,</if>
+            <if test="comenewtask != null ">`comenewtask`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="payId != null ">#{payId},</if>
+            <if test="money != null ">#{money},</if>
+            <if test="price != null ">#{price},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="payNo != null  and payNo != ''">#{payNo},</if>
+            <if test="param != null  and param != ''">#{param},</if>
+            <if test="payTime != null ">#{payTime},</if>
+            <if test="payTag != null  and payTag != ''">#{payTag},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="creatTime != null ">#{creatTime},</if>
+            <if test="upTime != null  and upTime != ''">#{upTime},</if>
+            <if test="thirdid != null  and thirdid != ''">#{thirdid},</if>
+            <if test="onlinepaytype != null ">#{onlinepaytype},</if>
+            <if test="url != null  and url != ''">#{url},</if>
+            <if test="operatorid != null ">#{operatorid},</if>
+            <if test="comenewtask != null ">#{comenewtask},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCodepayOrder" parameterType="CodepayOrder">
+        update codepay_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="payId != null ">`pay_id` = #{payId},</if>
+            <if test="money != null ">`money` = #{money},</if>
+            <if test="price != null ">`price` = #{price},</if>
+            <if test="type != null ">`type` = #{type},</if>
+            <if test="payNo != null  and payNo != ''">`pay_no` = #{payNo},</if>
+            <if test="param != null  and param != ''">`param` = #{param},</if>
+            <if test="payTime != null ">`pay_time` = #{payTime},</if>
+            <if test="payTag != null  and payTag != ''">`pay_tag` = #{payTag},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="creatTime != null ">`creat_time` = #{creatTime},</if>
+            <if test="upTime != null  and upTime != ''">`up_time` = #{upTime},</if>
+            <if test="thirdid != null  and thirdid != ''">`thirdid` = #{thirdid},</if>
+            <if test="onlinepaytype != null ">`onlinepaytype` = #{onlinepaytype},</if>
+            <if test="url != null  and url != ''">`url` = #{url},</if>
+            <if test="operatorid != null ">`operatorid` = #{operatorid},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCodepayOrderById" parameterType="Long">
+        delete from codepay_order where id = #{id}
+    </delete>
+
+    <delete id="deleteCodepayOrderByIds" parameterType="String">
+        delete from codepay_order where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

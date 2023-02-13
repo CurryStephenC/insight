@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpFinancialRecordMapper">
+    
+    <resultMap type="WpFinancialRecord" id="WpFinancialRecordResult">
+        <result property="id"    column="id"    />
+        <result property="typeid"    column="typeid"    />
+        <result property="uid"    column="uid"    />
+        <result property="rete"    column="rete"    />
+        <result property="buymoney"    column="buymoney"    />
+        <result property="creditmoney"    column="creditmoney"    />
+        <result property="profit"    column="profit"    />
+        <result property="totalmoney"    column="totalmoney"    />
+        <result property="begintime"    column="begintime"    />
+        <result property="endtime"    column="endtime"    />
+        <result property="returntime"    column="returntime"    />
+        <result property="freezedate"    column="freezedate"    />
+        <result property="onboarddate"    column="onboarddate"    />
+        <result property="datep1"    column="datep1"    />
+        <result property="datep2"    column="datep2"    />
+        <result property="status"    column="status"    />
+        <result property="nextstep"    column="nextstep"    />
+        <result property="pid"    column="pid"    />
+        <result property="month"    column="month"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="type"    column="type"    />
+        <result property="manualtime"    column="manualtime"    />
+        <result property="isgive"    column="isgive"    />
+        <result property="overself"    column="overself"    />
+        <result property="typename"    column="typename"    />
+        <result property="utel"    column="utel"    />
+        <result property="toputel"    column="toputel"    />
+        <result property="comenewtask"    column="comenewtask"    />
+        <result property="rebate"    column="rebate"    />
+    </resultMap>
+    
+    <resultMap type="FinancialRecordResp" id="FinancialRecordResult">
+        <result property="id"    column="id"    />
+        <result property="typeid"    column="typeid"    />
+        <result property="canover"    column="canover"    />
+        <result property="buymoney"    column="buymoney"    />
+        <result property="creditmoney"    column="creditmoney"    />
+        <result property="profit"    column="profit"    />
+        <result property="begintime"    column="begintime"    />
+        <result property="endtime"    column="endtime"    />
+        <result property="returntime"    column="returntime"    />
+        <result property="freezedate"    column="freezedate"    />
+        <result property="status"    column="status"    />
+        <result property="nextstep"    column="nextstep"    />
+        <result property="overself"    column="overself"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="typename"    column="name"    />
+        <result property="typerete"    column="typerete"    />
+        <result property="utel"    column="utel"    />
+        <result property="rebate"    column="rebate"    />
+        <collection property="lastProfit" column="id" select="com.wjyoption.system.mapper.WpFinancialDetailMapper.selectLastProfit" ></collection>
+    </resultMap>
+    
+    <sql id="selectWpFinancialRecordVo">
+        select t.id, t.typeid, t.uid, t.rete, t.buymoney, t.creditmoney, t.profit, t.totalmoney, t.begintime, t.endtime,t.comenewtask, 
+        	t.returntime, t.freezedate, t.onboarddate, t.datep1, t.datep2, t.status, t.nextstep, t.pid, t.month, t.createtime,t.rebate, 
+        	t.type, t.manualtime, t.isgive, t.overself,t2.name typename,u.utel,tu.utel toputel 
+        from wp_financial_record t
+        left join wp_userinfo u on t.uid = u.uid
+        left join wp_userinfo tu on tu.uid = u.topid
+        left join wp_financial_type t2 on t.typeid = t2.id	
+    </sql>
+
+    <select id="selectWpFinancialRecordList" parameterType="WpFinancialRecord" resultMap="WpFinancialRecordResult">
+        <include refid="selectWpFinancialRecordVo"/>
+        <where>  
+            <if test="typeid != null "> and t.`typeid` = #{typeid}</if>
+            <if test="comenewtask != null "> and t.`comenewtask` = #{comenewtask}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="normaltype != null "> and u.`normaltype` = #{normaltype}</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+            <if test="utel != null and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="toputel != null and toputel != ''"> and tu.`utel` = #{toputel}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="nextstep != null "> and t.`nextstep` = #{nextstep}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="isgive != null "> and t.`isgive` = #{isgive}</if>
+            <if test="overself != null "> and t.`overself` = #{overself}</if>
+<!--             <if test="endtimeBegin != null and endtimeEnd != null">  -->
+<!--             	and t.`endtime` between #{endtimeBegin} and #{endtimeEnd} -->
+<!--             </if> -->
+            <if test="endtimeBegin != null">
+				AND t.`endtime` &gt;= #{endtimeBegin}
+			</if>
+			<if test="endtimeEnd != null">
+				AND t.`endtime` &lt;= #{endtimeEnd}
+			</if>
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND from_unixtime(t.`createtime`,'%Y%m%d') &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND from_unixtime(t.`createtime`,'%Y%m%d') &lt;= #{params.endTime}
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectFinancialRecordList" parameterType="WpFinancialRecord" resultMap="FinancialRecordResult">
+        SELECT t.*,t2.`canover`,t2.name,t2.rete typerete,u.utel
+		FROM wp_financial_record t
+		LEFT JOIN wp_financial_type t2 ON t.`typeid` = t2.`id`
+		LEFT JOIN wp_userinfo u on u.uid = t.uid
+        <where>  
+            <if test="typeid != null "> and t.`typeid` = #{typeid}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="nextstep != null "> and t.`nextstep` = #{nextstep}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+            <if test="isgive != null "> and t.`isgive` = #{isgive}</if>
+            <if test="overself != null "> and t.`overself` = #{overself}</if>
+            <if test="comenewtask != null "> and t.`comenewtask` = #{comenewtask}</if>
+        </where>
+    </select>
+    <select id="selectIbRecordList" parameterType="WpFinancialRecord" resultType="WpFinancialRecord">
+        SELECT uid,sum(buymoney) buymoney
+		FROM wp_financial_record t
+        <where>
+        	<if test="typeid != null "> and t.`typeid` = #{typeid}</if>  
+            <if test="endtime != null "> and t.`endtime` > #{endtime}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="status != null "> and t.`status` = #{status}</if>
+            <if test="type != null "> and t.`type` = #{type}</if>
+        </where>
+        group by uid having sum(buymoney) >= #{buymoney}
+    </select>
+    
+    <select id="selectWpFinancialRecordById" parameterType="Integer" resultMap="WpFinancialRecordResult">
+        <include refid="selectWpFinancialRecordVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpFinancialRecord" parameterType="WpFinancialRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_financial_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="typeid != null ">`typeid`,</if>
+            <if test="uid != null ">`uid`,</if>
+            <if test="rete != null ">`rete`,</if>
+            <if test="buymoney != null ">`buymoney`,</if>
+            <if test="creditmoney != null ">`creditmoney`,</if>
+            <if test="profit != null ">`profit`,</if>
+            <if test="totalmoney != null ">`totalmoney`,</if>
+            <if test="begintime != null ">`begintime`,</if>
+            <if test="endtime != null ">`endtime`,</if>
+            <if test="returntime != null ">`returntime`,</if>
+            <if test="freezedate != null ">`freezedate`,</if>
+            <if test="onboarddate != null ">`onboarddate`,</if>
+            <if test="datep1 != null ">`datep1`,</if>
+            <if test="datep2 != null ">`datep2`,</if>
+            <if test="status != null ">`status`,</if>
+            <if test="nextstep != null ">`nextstep`,</if>
+            <if test="pid != null ">`pid`,</if>
+            <if test="month != null ">`month`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+            <if test="type != null ">`type`,</if>
+            <if test="manualtime != null ">`manualtime`,</if>
+            <if test="isgive != null ">`isgive`,</if>
+            <if test="overself != null ">`overself`,</if>
+            <if test="comenewtask != null ">`comenewtask`,</if>
+            <if test="rebate != null ">`rebate`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="typeid != null ">#{typeid},</if>
+            <if test="uid != null ">#{uid},</if>
+            <if test="rete != null ">#{rete},</if>
+            <if test="buymoney != null ">#{buymoney},</if>
+            <if test="creditmoney != null ">#{creditmoney},</if>
+            <if test="profit != null ">#{profit},</if>
+            <if test="totalmoney != null ">#{totalmoney},</if>
+            <if test="begintime != null ">#{begintime},</if>
+            <if test="endtime != null ">#{endtime},</if>
+            <if test="returntime != null ">#{returntime},</if>
+            <if test="freezedate != null ">#{freezedate},</if>
+            <if test="onboarddate != null ">#{onboarddate},</if>
+            <if test="datep1 != null ">#{datep1},</if>
+            <if test="datep2 != null ">#{datep2},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="nextstep != null ">#{nextstep},</if>
+            <if test="pid != null ">#{pid},</if>
+            <if test="month != null ">#{month},</if>
+            <if test="createtime != null ">#{createtime},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="manualtime != null ">#{manualtime},</if>
+            <if test="isgive != null ">#{isgive},</if>
+            <if test="overself != null ">#{overself},</if>
+            <if test="comenewtask != null ">#{comenewtask},</if>
+            <if test="rebate != null ">#{rebate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpFinancialRecord" parameterType="WpFinancialRecord">
+        update wp_financial_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="typeid != null ">`typeid` = #{typeid},</if>
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="rete != null ">`rete` = #{rete},</if>
+            <if test="buymoney != null ">`buymoney` = #{buymoney},</if>
+            <if test="creditmoney != null ">`creditmoney` = #{creditmoney},</if>
+            <if test="profit != null ">`profit` = #{profit},</if>
+            <if test="totalmoney != null ">`totalmoney` = #{totalmoney},</if>
+            <if test="begintime != null ">`begintime` = #{begintime},</if>
+            <if test="endtime != null ">`endtime` = #{endtime},</if>
+            <if test="returntime != null ">`returntime` = #{returntime},</if>
+            <if test="freezedate != null ">`freezedate` = #{freezedate},</if>
+            <if test="onboarddate != null ">`onboarddate` = #{onboarddate},</if>
+            <if test="datep1 != null ">`datep1` = #{datep1},</if>
+            <if test="datep2 != null ">`datep2` = #{datep2},</if>
+            <if test="status != null ">`status` = #{status},</if>
+            <if test="nextstep != null ">`nextstep` = #{nextstep},</if>
+            <if test="pid != null ">`pid` = #{pid},</if>
+            <if test="month != null ">`month` = #{month},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+            <if test="type != null ">`type` = #{type},</if>
+            <if test="manualtime != null ">`manualtime` = #{manualtime},</if>
+            <if test="isgive != null ">`isgive` = #{isgive},</if>
+            <if test="overself != null ">`overself` = #{overself},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpFinancialRecordById" parameterType="Integer">
+        delete from wp_financial_record where id = #{id}
+    </delete>
+
+    <delete id="deleteWpFinancialRecordByIds" parameterType="String">
+        delete from wp_financial_record where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.SysArticleTypeMapper">
+    
+    <resultMap type="SysArticleType" id="SysArticleTypeResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="status"    column="status"    />
+        <result property="order"    column="order"    />
+        <result property="navtype"    column="navType"    />
+        <result property="type"    column="type"    />
+    </resultMap>
+
+    <sql id="selectSysArticleTypeVo">
+        SELECT t.id, t.title, t.create_time, t.update_time, t.STATUS, t.`order`, t.navType, t.`type` FROM sys_article_type t
+    </sql>
+
+    <select id="selectSysArticleTypeList" parameterType="SysArticleType" resultMap="SysArticleTypeResult">
+        <include refid="selectSysArticleTypeVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="order != null "> and `order` = #{order}</if>
+            <if test="navtype != null "> and navType = #{navtype}</if>
+            <if test="type != null "> and `type` = #{type}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysArticleTypeById" parameterType="Long" resultMap="SysArticleTypeResult">
+        <include refid="selectSysArticleTypeVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysArticleType" parameterType="SysArticleType" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_article_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null  and title != ''">title,</if>
+            <if test="createTime != null ">create_time,</if>
+            <if test="updateTime != null ">update_time,</if>
+            <if test="status != null ">status,</if>
+            <if test="order != null ">`order`,</if>
+            <if test="navtype != null ">navType,</if>
+            <if test="type != null ">`type`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null  and title != ''">#{title},</if>
+            <if test="createTime != null ">#{createTime},</if>
+            <if test="updateTime != null ">#{updateTime},</if>
+            <if test="status != null ">#{status},</if>
+            <if test="order != null ">#{order},</if>
+            <if test="navtype != null ">#{navtype},</if>
+            <if test="type != null ">#{type},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysArticleType" parameterType="SysArticleType">
+        update sys_article_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null  and title != ''">title = #{title},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+            <if test="updateTime != null ">update_time = #{updateTime},</if>
+            <if test="status != null ">status = #{status},</if>
+            <if test="order != null ">`order` = #{order},</if>
+            <if test="navtype != null ">navType = #{navtype},</if>
+            <if test="type != null ">`type` = #{type},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysArticleTypeById" parameterType="Long">
+        delete from sys_article_type where id = #{id}
+    </delete>
+
+    <delete id="deleteSysArticleTypeByIds" parameterType="String">
+        delete from sys_article_type where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

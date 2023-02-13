@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改订单模块')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-order-edit" th:object="${wpOrder}">
+            <input name="oid" th:field="*{oid}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户ID：</label>
+                <div class="col-sm-8">
+                    <input name="uid" th:field="*{uid}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">产品ID：</label>
+                <div class="col-sm-8">
+                    <input name="pid" th:field="*{pid}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">方向0涨 1跌，：</label>
+                <div class="col-sm-8">
+                    <input name="ostyle" th:field="*{ostyle}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">建仓时间：</label>
+                <div class="col-sm-8">
+                    <input name="buytime" th:field="*{buytime}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">手数：</label>
+                <div class="col-sm-8">
+                    <input name="onumber" th:field="*{onumber}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">平仓时间：</label>
+                <div class="col-sm-8">
+                    <input name="selltime" th:field="*{selltime}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">0交易，1平仓：</label>
+                <div class="col-sm-8">
+                    <select name="ostaus" class="form-control m-b">
+                        <option value="">所有</option>
+                    </select>
+                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">入仓价：</label>
+                <div class="col-sm-8">
+                    <input name="buyprice" th:field="*{buyprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">平仓价：</label>
+                <div class="col-sm-8">
+                    <input name="sellprice" th:field="*{sellprice}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">点数/分钟数：</label>
+                <div class="col-sm-8">
+                    <input name="endprofit" th:field="*{endprofit}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">盈亏比例：</label>
+                <div class="col-sm-8">
+                    <input name="endloss" th:field="*{endloss}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">总费用：</label>
+                <div class="col-sm-8">
+                    <input name="fee" th:field="*{fee}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">1点位、2时间(s)：</label>
+                <div class="col-sm-8">
+                    <input name="eid" th:field="*{eid}" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">订单编号：</label>
+                <div class="col-sm-8">
+                    <input name="orderno" th:field="*{orderno}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">商品名称：</label>
+                <div class="col-sm-8">
+                    <input name="ptitle" th:field="*{ptitle}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">买后余额：</label>
+                <div class="col-sm-8">
+                    <input name="commission" th:field="*{commission}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">盈亏：</label>
+                <div class="col-sm-8">
+                    <input name="ploss" th:field="*{ploss}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">0,可查询，1不可查询：</label>
+                <div class="col-sm-8">
+                    <input name="display" th:field="*{display}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">null：</label>
+                <div class="col-sm-8">
+                    <input name="isshow" th:field="*{isshow}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">是否盈利1盈利2亏损3无效：</label>
+                <div class="col-sm-8">
+                    <input name="isWin" th:field="*{isWin}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">1盈0不控利2亏损：</label>
+                <div class="col-sm-8">
+                    <select name="kongType" class="form-control m-b">
+                        <option value="">所有</option>
+                    </select>
+                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">手续费：</label>
+                <div class="col-sm-8">
+                    <input name="sxFee" th:field="*{sxFee}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">是否可控:1，可控，2，不可控：</label>
+                <div class="col-sm-8">
+                    <input name="canKong" th:field="*{canKong}" class="form-control" type="text" required>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/order";
+        $("#form-order-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-order-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

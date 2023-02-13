@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpRedEnvelopeMapper">
+    
+    <resultMap type="WpRedEnvelope" id="WpRedEnvelopeResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="putel"    column="putel"    />
+        <result property="toputel"    column="toputel"    />
+        <result property="money"    column="money"    />
+        <result property="lavemoney"    column="lavemoney"    />
+        <result property="refid"    column="refid"    />
+        <result property="type"    column="type"    />
+        <result property="endtime"    column="endtime"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <sql id="selectWpRedEnvelopeVo">
+        select t.id, t.uid, t.money, t.lavemoney, t.refid, t.type, t.endtime, t.createtime,u.utel,p.utel putel,top2.utel toputel 
+        from wp_red_envelope t
+        left join wp_userinfo u on u.uid = t.uid
+        left join wp_userinfo p on p.uid = u.oid
+        left join wp_userinfo top2 on top2.uid = u.topid
+    </sql>
+
+    <select id="selectWpRedEnvelopeList" parameterType="WpRedEnvelope" resultMap="WpRedEnvelopeResult">
+        <include refid="selectWpRedEnvelopeVo"/>
+        <where>  
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="normaltype != null "> and u.`normaltype` = #{normaltype}</if>
+            <if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+            <if test="utel != null and utel != '' "> and u.`utel` = #{utel}</if>
+            <if test="putel != null and putel != '' "> and p.`utel` = #{putel}</if>
+            <if test="toputel != null and toputel != '' "> and top2.`utel` = #{toputel}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND from_unixtime(t.`createtime`,'%Y%m%d') &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND from_unixtime(t.`createtime`,'%Y%m%d') &lt;= #{params.endTime}
+			</if>
+        </where>
+    </select>
+    
+    <select id="selectWpRedEnvelopeById" parameterType="Integer" resultMap="WpRedEnvelopeResult">
+        <include refid="selectWpRedEnvelopeVo"/>
+        where t.id = #{id}
+    </select>
+    
+    <select id="selectRedMoney" parameterType="Integer" resultType="java.math.BigDecimal">
+    	select sum(t.lavemoney) 
+        from wp_red_envelope t
+        where t.uid = #{uid}
+    </select>
+        
+    <insert id="insertWpRedEnvelope" parameterType="WpRedEnvelope" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_red_envelope
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">`uid`,</if>
+            <if test="money != null ">`money`,</if>
+            <if test="lavemoney != null ">`lavemoney`,</if>
+            <if test="refid != null ">`refid`,</if>
+            <if test="type != null ">`type`,</if>
+            <if test="endtime != null ">`endtime`,</if>
+            <if test="createtime != null ">`createtime`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null ">#{uid},</if>
+            <if test="money != null ">#{money},</if>
+            <if test="lavemoney != null ">#{lavemoney},</if>
+            <if test="refid != null ">#{refid},</if>
+            <if test="type != null ">#{type},</if>
+            <if test="endtime != null ">#{endtime},</if>
+            <if test="createtime != null ">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpRedEnvelope" parameterType="WpRedEnvelope">
+        update wp_red_envelope
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="money != null ">`money` = #{money},</if>
+            <if test="lavemoney != null ">`lavemoney` = #{lavemoney},</if>
+            <if test="refid != null ">`refid` = #{refid},</if>
+            <if test="type != null ">`type` = #{type},</if>
+            <if test="endtime != null ">`endtime` = #{endtime},</if>
+            <if test="createtime != null ">`createtime` = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpRedEnvelopeById" parameterType="Integer">
+        delete from wp_red_envelope where id = #{id}
+    </delete>
+
+    <delete id="deleteWpRedEnvelopeByIds" parameterType="String">
+        delete from wp_red_envelope where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

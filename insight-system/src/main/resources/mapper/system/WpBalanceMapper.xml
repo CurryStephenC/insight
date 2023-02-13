@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpBalanceMapper">
+    
+    <resultMap type="WpBalance" id="WpBalanceResult">
+        <result property="bpid"    column="bpid"    />
+        <result property="bptype"    column="bptype"    />
+        <result property="bptime"    column="bptime"    />
+        <result property="bpprice"    column="bpprice"    />
+        <result property="realprice"    column="realprice"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="uid"    column="uid"    />
+        <result property="utel"    column="utel"    />
+        <result property="userMoney"    column="usermoney"    />
+        <result property="isverified"    column="isverified"    />
+        <result property="cltime"    column="cltime"    />
+        <result property="bankid"    column="bankid"    />
+        <result property="bpbalance"    column="bpbalance"    />
+        <result property="btime"    column="btime"    />
+        <result property="regPar"    column="reg_par"    />
+        <result property="balanceSn"    column="balance_sn"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="banktype"    column="banktype"    />
+        <result property="userremark"    column="userremark"    />
+        <result property="thirdid"    column="thirdid"    />
+        <result property="ispush"    column="ispush"    />
+        <result property="oid"    column="oid"    />
+        <result property="outel"    column="outel"    />
+        <result property="topid"    column="topid"    />
+        <result property="toputel"    column="toputel"    />
+    </resultMap>
+
+    <sql id="selectWpBalanceVo">
+        select t.*,u.utel,u.usermoney,o.utel outel,tu.utel toputel,u.oid,u.topid
+        from wp_balance t
+        left join wp_userinfo u on t.uid = u.uid
+        left join wp_userinfo o on o.uid = u.oid
+        left join wp_userinfo tu on tu.uid = u.topid
+    </sql>
+	<sql id="listWhere">
+		<where>  
+            <if test="bptype != null"> and t.`bptype` = #{bptype}</if>
+            <if test="uid != null "> and t.`uid` = #{uid}</if>
+            <if test="topid != null "> and u.`topid` = #{topid}</if>
+            <if test="banktype != null and banktype != ''"> and t.`banktype` = #{banktype}</if>
+            <if test="normaltype != null "> and u.`normaltype` = #{normaltype}</if>
+            <if test="utel != null and utel != ''"> and u.`utel` = #{utel}</if>
+            <if test="outel != null and outel != ''"> and o.`utel` = #{outel}</if>
+            <if test="toputel != null and toputel != ''"> and tu.`utel` = #{toputel}</if>
+            <if test="isverified != null "> and t.`isverified` = #{isverified}</if>
+            <if test="balanceSn != null  and balanceSn != ''"> and t.`balance_sn` = #{balanceSn}</if>
+            <if test="thirdid != null  and thirdid != ''"> and t.`thirdid` = #{thirdid}</if>
+            <if test="ispush != null "> and t.`ispush` = #{ispush}</if>
+            <if test="noisverified != null "> and t.`isverified` &lt;&gt; #{noisverified}</if>
+            <if test="beginBtime != null "> and t.`bptime` <![CDATA[ >= ]]> #{beginBtime}</if>
+            <if test="endBtime != null "> and t.`bptime` <![CDATA[ <= ]]> #{endBtime}</if>
+            
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND from_unixtime(t.`cltime`,'%Y%m%d') &gt;= #{params.beginTime}
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND from_unixtime(t.`cltime`,'%Y%m%d') &lt;= #{params.endTime}
+			</if>
+			<if test="topids != null">
+				AND u.`topid` in 
+				<foreach item="uid" collection="topids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+			<if test="uids != null">
+				AND t.`uid` in 
+				<foreach item="uid" collection="uids" open="(" separator="," close=")">
+		            #{uid}
+		        </foreach>
+			</if>
+        </where>
+	</sql>
+    <select id="selectWpBalanceList" parameterType="WpBalance" resultMap="WpBalanceResult">
+        <include refid="selectWpBalanceVo"/>
+        <include refid="listWhere"/>
+    </select>
+    <select id="selectBalanceTotal" parameterType="WpBalance" resultType="java.util.Map">
+        select sum(if(t.bptype=0,t.realprice,0)) withdraw,sum(if(t.bptype=2,t.bpprice,0)) recharge
+        from wp_balance t
+        left join wp_userinfo u on t.uid = u.uid
+        left join wp_userinfo o on o.uid = u.oid
+        left join wp_userinfo tu on tu.uid = u.topid
+        <include refid="listWhere"/>
+    </select>
+    
+    <select id="selectDailyTotal" parameterType="WpBalance" resultType="java.util.Map">
+        select sum(t.realprice) totalMoney,count(DISTINCT t.uid) userNum
+        from wp_balance t
+        left join wp_userinfo u on t.uid = u.uid
+        left join wp_userinfo o on o.uid = u.oid
+        left join wp_userinfo tu on tu.uid = u.topid
+        <include refid="listWhere"/>
+    </select>
+    
+    <select id="selectWpBalanceById" parameterType="Integer" resultMap="WpBalanceResult">
+        <include refid="selectWpBalanceVo"/>
+        where t.bpid = #{bpid}
+    </select>
+    <select id="selectWpBalanceByOrderid" parameterType="String" resultMap="WpBalanceResult">
+        <include refid="selectWpBalanceVo"/>
+        where t.balance_sn = #{balance_sn}
+    </select>
+        
+    <insert id="insertWpBalance" parameterType="WpBalance" useGeneratedKeys="true" keyProperty="bpid">
+        insert into wp_balance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bptype != null">`bptype`,</if>
+            <if test="bptime != null ">`bptime`,</if>
+            <if test="bpprice != null ">`bpprice`,</if>
+            <if test="realprice != null ">`realprice`,</if>
+            <if test="remarks != null  and remarks != ''">`remarks`,</if>
+            <if test="uid != null ">`uid`,</if>
+            <if test="isverified != null ">`isverified`,</if>
+            <if test="cltime != null ">`cltime`,</if>
+            <if test="bankid != null ">`bankid`,</if>
+            <if test="bpbalance != null  and bpbalance != ''">`bpbalance`,</if>
+            <if test="btime != null ">`btime`,</if>
+            <if test="regPar != null  and regPar != ''">`reg_par`,</if>
+            <if test="balanceSn != null  and balanceSn != ''">`balance_sn`,</if>
+            <if test="payType != null  and payType != ''">`pay_type`,</if>
+            <if test="banktype != null  and banktype != ''">`banktype`,</if>
+            <if test="userremark != null  and userremark != ''">`userremark`,</if>
+            <if test="thirdid != null">`thirdid`,</if>
+            <if test="ispush != null ">`ispush`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bptype != null">#{bptype},</if>
+            <if test="bptime != null ">#{bptime},</if>
+            <if test="bpprice != null ">#{bpprice},</if>
+            <if test="realprice != null ">#{realprice},</if>
+            <if test="remarks != null  and remarks != ''">#{remarks},</if>
+            <if test="uid != null ">#{uid},</if>
+            <if test="isverified != null ">#{isverified},</if>
+            <if test="cltime != null ">#{cltime},</if>
+            <if test="bankid != null ">#{bankid},</if>
+            <if test="bpbalance != null  and bpbalance != ''">#{bpbalance},</if>
+            <if test="btime != null ">#{btime},</if>
+            <if test="regPar != null  and regPar != ''">#{regPar},</if>
+            <if test="balanceSn != null  and balanceSn != ''">#{balanceSn},</if>
+            <if test="payType != null  and payType != ''">#{payType},</if>
+            <if test="banktype != null  and banktype != ''">#{banktype},</if>
+            <if test="userremark != null  and userremark != ''">#{userremark},</if>
+            <if test="thirdid != null">#{thirdid},</if>
+            <if test="ispush != null ">#{ispush},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpBalance" parameterType="WpBalance">
+        update wp_balance
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bptype != null">`bptype` = #{bptype},</if>
+            <if test="bptime != null ">`bptime` = #{bptime},</if>
+            <if test="bpprice != null ">`bpprice` = #{bpprice},</if>
+            <if test="realprice != null ">`realprice` = #{realprice},</if>
+            <if test="remarks != null  and remarks != ''">`remarks` = #{remarks},</if>
+            <if test="uid != null ">`uid` = #{uid},</if>
+            <if test="isverified != null ">`isverified` = #{isverified},</if>
+            <if test="cltime != null ">`cltime` = #{cltime},</if>
+            <if test="bankid != null ">`bankid` = #{bankid},</if>
+            <if test="bpbalance != null  and bpbalance != ''">`bpbalance` = #{bpbalance},</if>
+            <if test="btime != null ">`btime` = #{btime},</if>
+            <if test="regPar != null  and regPar != ''">`reg_par` = #{regPar},</if>
+            <if test="balanceSn != null  and balanceSn != ''">`balance_sn` = #{balanceSn},</if>
+            <if test="payType != null  and payType != ''">`pay_type` = #{payType},</if>
+            <if test="banktype != null  and banktype != ''">`banktype` = #{banktype},</if>
+            <if test="userremark != null  and userremark != ''">`userremark` = #{userremark},</if>
+            <if test="thirdid != null  and thirdid != ''">`thirdid` = #{thirdid},</if>
+            <if test="ispush != null ">`ispush` = #{ispush},</if>
+        </trim>
+        where bpid = #{bpid}
+    </update>
+
+    <delete id="deleteWpBalanceById" parameterType="Integer">
+        delete from wp_balance where bpid = #{bpid}
+    </delete>
+
+    <delete id="deleteWpBalanceByIds" parameterType="String">
+        delete from wp_balance where bpid in 
+        <foreach item="bpid" collection="array" open="(" separator="," close=")">
+            #{bpid}
+        </foreach>
+    </delete>
+    
+</mapper>

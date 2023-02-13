@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改前端用户')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-userinfo-edit" th:object="${wpUserinfo}">
+            <input name="uid" th:field="*{uid}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户名称：</label>
+                <div class="col-sm-8">
+                    <input name="username" th:field="*{username}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户密码：</label>
+                <div class="col-sm-8">
+                    <input name="upwd" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">电话号码：</label>
+                <div class="col-sm-8">
+                    <input name="utel" th:field="*{utel}" class="form-control" type="text" readonly="readonly">
+                </div>
+            </div>
+            <div class="form-group" shiro:hasPermission="system:userinfo:updateoid">    
+                <label class="col-sm-3 control-label">上级：</label>
+                <div class="col-sm-8">
+                    <input name="outel" th:field="*{outel}" class="form-control" type="text" >
+                </div>
+            </div>
+            <div class="form-group" shiro:hasPermission="system:userinfo:updatetopid">    
+                <label class="col-sm-3 control-label">销售：</label>
+                <div class="col-sm-8">
+                	<select name="topid" class="form-control m-b" >
+                        <option th:each="dict : ${top}" th:text="${dict.utel}" th:value="${dict.uid}" th:field="*{topid}"></option>
+                    </select>
+<!--                     <input name="toputel" th:field="*{toputel}" class="form-control" type="text" > -->
+                </div>
+            </div>
+            <div class="form-group" shiro:hasPermission="system:userinfo:updateib">    
+                <label class="col-sm-3 control-label">IB身份：</label>
+                <div class="col-sm-8">
+                	<select name="ibstatus" class="form-control m-b" th:with="type=${@dict.getType('wp_userinfo_ib')}" >
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{ibstatus}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户类型：</label>
+                <div class="col-sm-8">
+                    <select name="otype" class="form-control m-b" th:with="type=${@dict.getType('wp_userinfo_otype')}" required disabled="disabled">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{otype}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">正常用户：</label>
+                <div class="col-sm-8">
+                    <select name="normaltype" class="form-control m-b" th:with="type=${@dict.getType('wp_userinfo_normal')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{normaltype}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">用户昵称：</label>
+                <div class="col-sm-8">
+                    <input name="nickname" th:field="*{nickname}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">E-MAIL：</label>
+                <div class="col-sm-8">
+                    <input name="email" th:field="*{email}" class="form-control" type="text">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script type="text/javascript">
+        var prefix = ctx + "system/userinfo";
+        $("#form-userinfo-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-userinfo-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wjyoption.system.mapper.WpRiskMapper">
+    
+    <resultMap type="WpRisk" id="WpRiskResult">
+        <result property="id"    column="id"    />
+        <result property="toWin"    column="to_win"    />
+        <result property="toLoss"    column="to_loss"    />
+        <result property="chance"    column="chance"    />
+        <result property="minPrice"    column="min_price"    />
+    </resultMap>
+
+    <sql id="selectWpRiskVo">
+        select t.id, t.to_win, t.to_loss, t.chance, t.min_price from wp_risk t
+    </sql>
+
+    <select id="selectWpRiskList" parameterType="WpRisk" resultMap="WpRiskResult">
+        <include refid="selectWpRiskVo"/>
+        <where>  
+        </where>
+    </select>
+    
+    <select id="selectWpRiskById" parameterType="Integer" resultMap="WpRiskResult">
+        <include refid="selectWpRiskVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertWpRisk" parameterType="WpRisk" useGeneratedKeys="true" keyProperty="id">
+        insert into wp_risk
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="toWin != null  and toWin != ''">`to_win`,</if>
+            <if test="toLoss != null  and toLoss != ''">`to_loss`,</if>
+            <if test="chance != null  and chance != ''">`chance`,</if>
+            <if test="minPrice != null ">`min_price`,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="toWin != null  and toWin != ''">#{toWin},</if>
+            <if test="toLoss != null  and toLoss != ''">#{toLoss},</if>
+            <if test="chance != null  and chance != ''">#{chance},</if>
+            <if test="minPrice != null ">#{minPrice},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWpRisk" parameterType="WpRisk">
+        update wp_risk
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="toWin != null">`to_win` = #{toWin},</if>
+            <if test="toLoss != null">`to_loss` = #{toLoss},</if>
+            <if test="chance != null">`chance` = #{chance},</if>
+            <if test="minPrice != null ">`min_price` = #{minPrice},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteWpRiskById" parameterType="Integer">
+        delete from wp_risk where id = #{id}
+    </delete>
+
+    <delete id="deleteWpRiskByIds" parameterType="String">
+        delete from wp_risk where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

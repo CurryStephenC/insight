@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('理财记录列表')" />
+    <th:block th:include="include :: layout-latest-css" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <p>理财产品：</p>
+                                <select name="typeid" >
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${typelist}" th:text="${dict.name}" th:value="${dict.id}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>用户：</p>
+                                <input type="text" name="utel"/>
+                            </li>
+                            <li>
+                                <p>销售：</p>
+                                <input type="text" name="toputel"/>
+                            </li>
+                            <li>
+                                <p>状态：</p>
+                                <select name="status" th:with="type=${@dict.getType('wp_financial_record_status')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>正常用户：</p>
+                                <select name="normaltype" th:with="type=${@dict.getType('wp_userinfo_normal')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    <option value="">所有</option>
+                                </select>
+                            </li>
+<!--                             <li> -->
+<!--                                 <p>下一个步骤：0、到期继续，1、到期赎回：</p> -->
+<!--                                 <select name="nextstep" th:with="type=${@dict.getType('wp_financial_nextstep')}"> -->
+<!--                                     <option value="">所有</option> -->
+<!--                                     <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option> -->
+<!--                                 </select> -->
+<!--                             </li> -->
+                            <li>
+                                <p>类型：</p>
+                                <select name="type" th:with="type=${@dict.getType('wp_financial_type')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <p>是否赠送：</p>
+                                <select name="isgive" th:with="type=${@dict.getType('wp_financial_isgive')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li class="select-time">
+                                <p>日期：</p>
+                                <input type="text" class="time-input" placeholder="开始时间" name="params[beginTime]" data-format="yyyyMMdd"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" placeholder="结束时间" name="params[endTime]" data-format="yyyyMMdd"/>
+                            </li>
+<!--                             <li> -->
+<!--                                 <p>用户手动赎回：1、否，2、赎回中，3、已赎回：</p> -->
+<!--                                 <select name="overself" th:with="type=${@dict.getType('wp_financial_overself')}"> -->
+<!--                                     <option value="">所有</option> -->
+<!--                                     <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option> -->
+<!--                                 </select> -->
+<!--                             </li> -->
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:financialrecord:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                
+                <a class="btn btn-success" onclick="createdata()" shiro:hasPermission="system:financialrecord:createdata">
+                    <i class="fa fa-plus"></i> 生成数据
+                </a>
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:financialrecord:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:financialrecord:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a> -->
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:financialrecord:export">
+                    <i class="fa fa-download"></i> 导出
+                 </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: layout-latest-js" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:financialrecord:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:financialrecord:remove')}]];
+        var overFlag = [[${@permission.hasPermi('system:financialrecord:over')}]];
+        var detailFlag = [[${@permission.hasPermi('system:financialrecorddetail:list')}]];
+        var statusDatas = [[${@dict.getType('wp_financial_record_status')}]];
+        var nextstepDatas = [[${@dict.getType('wp_financial_nextstep')}]];
+        var typeDatas = [[${@dict.getType('wp_financial_type')}]];
+        var isgiveDatas = [[${@dict.getType('wp_financial_isgive')}]];
+        var overselfDatas = [[${@dict.getType('wp_financial_overself')}]];
+        var prefix = ctx + "system/financialrecord";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                showColumns:true,
+                showSearch:true,
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "理财记录",
+                sortName: "id",
+		        sortOrder: "desc",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field : 'id', 
+                    title : '主键ID',
+                    visible: false
+                },
+                {
+                    title: "序号",
+                    formatter: function (value, row, index) {
+                 	    return $.table.serialNumber(index);
+                    }
+                },
+                {
+                    field : 'typename', 
+                    title : '理财产品'
+                },
+                {
+                    field : 'utel', 
+                    title : '用户'
+                },
+                {
+                    field : 'toputel', 
+                    title : '销售'
+                },
+                {
+                    field : 'buymoney', 
+                    title : '购买金额'
+                },
+                {
+                    field : 'creditmoney', 
+                    title : '赠送金额'
+                },
+                {
+                    field : 'profit', 
+                    title : '利润'
+                },
+                {
+                    field : 'begintime', 
+                    title : '开始计息时间',
+                    formatter: function(value, row, index) {
+                    	return $.common.formatDate(value).split(' ')[0];
+                    }
+                },
+                {
+                    field : 'endtime', 
+                    title : '结束计息时间',
+                    formatter: function(value, row, index) {
+                    	return $.common.formatDate(value).split(' ')[0];
+                    }
+                },
+                {
+                    field : 'returntime', 
+                    title : '可操作下一步时间',
+                    visible : false,
+                    formatter: function(value, row, index) {
+                    	return $.common.formatDate(value).split(' ')[0];
+                    }
+                },
+                {
+                    field : 'freezedate', 
+                    title : '冻结天数'
+                },
+                {
+                    field : 'status', 
+                    title : '状态',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(statusDatas, value);
+                    }
+                },
+                {
+                    field : 'nextstep', 
+                    title : '是否赎回',
+                    visible : false,
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(nextstepDatas, value);
+                    }
+                },
+                {
+                    field : 'createtime', 
+                    title : '购买时间',
+                    formatter: function(value, row, index) {
+                    	return $.common.formatDate(value);
+                    }
+                },
+                {
+                    field : 'type', 
+                    title : '类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(typeDatas, value);
+                    }
+                },
+                {
+                    field : 'manualtime', 
+                    title : '手动赎回时间',
+                    visible : false,
+                    formatter: function(value, row, index) {
+                    	if(value)
+                    	return $.common.formatDate(value);
+                    }
+                },
+                {
+                    field : 'isgive', 
+                    title : '是否赠送',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(isgiveDatas, value);
+                    }
+                },
+                {
+                    field : 'overself', 
+                    title : '手动赎回',
+                    visible : false,
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(overselfDatas, value);
+                    }
+                },
+                {
+                    field : 'comenewtask', 
+                    title : '新手任务',
+                    visible: false,
+                    formatter: function(value, row, index) {
+                    	return value == 0 ? "不是" : "是";
+                    }
+                },
+                {
+                    field : 'rebate', 
+                    title : '折扣',
+                    visible: false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-primary btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="detail(\'' + row.id + '\')"><i class="fa fa-edit"></i>收益详情</a> ');
+                        if(row.status == 0){
+                        	actions.push('<a class="btn btn-warning btn-xs ' + overFlag + '" href="javascript:void(0)" onclick="over(\'' + row.id + '\')"><i class="fa fa-remove"></i>结束</a> ');
+                        }
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+        
+        function over(id){
+        	$.modal.confirm('确认结束吗？',
+            	function(){
+	        		$.post(prefix + "/over", {"id":id}, function(result) {
+	    				if (result.code == 0) {
+	    					$.modal.msgSuccess("Success");
+	    					$.table.refresh();
+	                    } else {
+	    					$.modal.alertError(result.msg);
+	    				}
+	    				$.modal.closeLoading();
+	    			});
+            	});
+        	
+					
+        }
+        
+        /*字典列表-详细*/
+		function detail(id) {
+		    var url = prefix + '/detail/' + id;
+		    $.modal.openTab("理财收益详情", url);
+		}
+        /*字典列表-详细*/
+		function createdata() {
+		    var url = prefix + '/createdata';
+		    $.modal.open("生成记录", url);
+		}
+    </script>
+</body>
+</html>
