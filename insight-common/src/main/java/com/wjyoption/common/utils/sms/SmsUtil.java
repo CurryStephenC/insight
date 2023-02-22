@@ -24,34 +24,22 @@ import com.wjyoption.common.utils.sms.vo.SmsResp;
 public class SmsUtil {
 
 	private static Logger logger = LoggerFactory.getLogger(SmsUtil.class);
-	static String SMS_URL = "https://intapi.253.com/send/json";
-	static String SMS_BATCH_URL = "https://intapi.253.com/send";
+	static String SMS_URL = "";
+	static String SMS_BATCH_URL = "";
 	/**营销*/
-	static String[] SMS_MARK = {"IM4366453","xQ2E7kSHAT779d"};
-//	static String SMS_PASSWORD = "xQ2E7kSHAT779d";
+	static String[] SMS_MARK = {"",""};
+//	static String SMS_PASSWORD = "";
 	/**验证码**/
-	static String[] SMS_VERICODE = {"I2307550","MKQ5mGan4x6411"};
-//	static String SMS_PASSWORD_VERICODE = "MKQ5mGan4x6411";
+	static String[] SMS_VERICODE = {"",""};
+//	static String SMS_PASSWORD_VERICODE = "";
 	
 	/**验证码 互亿无线**/
 	static String SMS_URL_IHUYI = "https://106.ihuyi.com/webservice/sms.php?method=Submit";
-	static String[] SMS_VERICODE_IHUYI = {"cf_haoniu","3285a44fb62de0083ff7a70831d664f3"};
+	static String[] SMS_VERICODE_IHUYI = {"cf_haoniu",""};
 	/**验证码 互亿无线**/
 	
 	public static void main(String[] args) {
-//		List<String> mobile = new ArrayList<String>();
-//		mobile.add("123");
-//		mobile.add("456");
-//		String res = mobile.stream().collect(Collectors.joining(","));
-//		String content = SmsTemplateEnum.TEMPLATE_1.getContent();
-//		content = String.format(content, "https://wa.me/85264703438","$100");
-//		_235Send(content, "911234567890");
-//		System.out.println(String.format("'%%':输出%%。%%"));
-//		System.out.println(res);
-		
-//		SmsResp res = sendMsg_Ali("{\"name\":\"张三\",\"money\":\"500.00\"}", TemplateCodeEnum.TOP_UP_SUCCESS, "18682082910");
-//		System.out.println(JSON.toJSONString(res));
-		mtSend("917355 is your verification code for this operation", "917700011417");
+		mtSend("917355 is your verification code for this operation", "91770001117");
 	}
 	
 	/**
@@ -63,7 +51,6 @@ public class SmsUtil {
 	 */
 	public static SmsResp sendMsg(String content,String mobile,boolean mark){
 		return mark ? _235Send(content, mobile, SMS_MARK) : _ihuyiSend(content, mobile, SMS_VERICODE_IHUYI);
-//		return _235Send(content, mobile,mark ? SMS_MARK : SMS_VERICODE);
 	}
 	
 	public static SmsResp sendMsg(String contentJson,String mobile,TemplateCodeEnum code){
@@ -166,7 +153,6 @@ public class SmsUtil {
 		params.put("mobile", mobile.stream().collect(Collectors.joining(",")));
 		String param = JSON.toJSONString(params);
 		try {
-//			logger.info("批量处理_235SendBatch params:" +param);
 			String res = HttpUtils.post(SMS_URL, param,new HashMap<>());
 			logger.info("批量处理_235SendBatch res:" + res);
 			if(!StringUtils.startsWith(res, "{")){
@@ -192,7 +178,7 @@ public class SmsUtil {
 	 */
 	private static SmsResp sendMsg_Ali(String templateJson,TemplateCodeEnum code,String phones){
 		SmsResp resp = new SmsResp();
-		DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAI4G5JocSxbDtFTzfDeAoM", "M42N200hjT5L530fj7tK8BIzzOPb6E");
+		DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", "", "");
         IAcsClient client = new DefaultAcsClient(profile);
 
         CommonRequest request = new CommonRequest();
